@@ -1,0 +1,555 @@
+## PRODUCT FIXED FLOAT OIS
+## SENTINEL VERSION [0.18.3]
+#set ($markitwireTraderValue = $!utils.getValueAt("HEADER:SENTINEL:SEND_TO_MARKIT", false, false, -1, -1))
+#set ($timeout_str = $!utils.getValueAt("HEADER:SENTINEL:TIMEOUT", false, false, -1, -1))
+#set ($quoteConvention = $!utils.getValueAt("HEADER:SENTINEL:QUOTE_TYPE", false, false, -1, -1))
+#set ($timeout = 90)
+#if ($timeout_str)
+	#set ($timeout = $timeout.parseInt($timeout_str) * 1000)
+#end
+#set ($sign = $!utils.getValueAt('HEADER:SENTINEL:PAY_RECEIVE', false, true, -1, -1))
+#set ($fixedRate = $!utils.getValueAt('HEADER:SENTINEL:FIXED_RATE', false, false, -1, -1))
+#set ($floatSpread = $!utils.getValueAt('HEADER:SENTINEL:FLOAT_SPREAD', false, false, -1, -1))
+#if ($data.get("sub_product") == "RatesFixedFloat" || $data.get("sub_product") == "RatesFixedFloat0Coupon" || $data.get("sub_product") == "RatesFixedFloatOis" )
+	#set ($rateSpreadFields = 2)
+#elseif ($data.get("sub_product") == "RatesFixedFixed")
+	#set ($rateSpreadFields = 1)
+#elseif ($data.get("sub_product") == "RatesBasisOis" || $data.get("sub_product") == "RatesBasis")
+	#set ($rateSpreadFields = 0)
+#end
+    #if($action != "QuickEnterRFQ")
+        "traderId" : "$userId" ## NEEDED BY API
+    	,"rfqId" : "$rfqId", ## NEEDED BY API
+    	"rfqVersion": $rfqVersionId, ## NEEDED BY API
+    #end
+    #if ($StringUtils.isEmpty($!conv['COUNTERPARTY'].get($!utils.getValueAt("HEADER:SENTINEL:COUNTERPARTY", false, false, -1, -1))))
+        "counterpartyId": "$!utils.getValueAt("HEADER:SENTINEL:COUNTERPARTY", false, false, -1, -1)",
+    #else
+        "counterpartyId": "$!conv['COUNTERPARTY'].get($!utils.getValueAt("HEADER:SENTINEL:COUNTERPARTY", false, false, -1, -1))",
+    #end
+    "quoteBody": { ## MEANS "price" in SENTINEL VERSION [0.18.3] output
+		#if ($sign == "PAY")
+			## Pay params
+			#set ($quote_value = $!utils.getValueAt("HEADER:SENTINEL:FACE_PRICE", false, false, -1, -1))
+			#set ($mifid_price = $!utils.getValueAt("HEADER:SENTINEL:MIFID_PRICE", false, false, -1, -1))
+			#set ($priceType = $utils.getValueAt("HEADER:SENTINEL:MIFID_PRICE_TYPE", false, false, -1, -1))
+			#set ($upfrontPayment = $utils.getValueAt("HEADER:SENTINEL:UPFRONT_PAYMENT", true, false, -1, -1))
+			#set ($upfrontPaymentCcy = $utils.getValueAt("HEADER:SENTINEL:UPFRONT_PAYMENT_CCY", false, false, -1, -1))
+			#set ($additionalTerms = $utils.getValueAt("HEADER:SENTINEL:ADDITIONAL_TERMS", false, false, -1, -1))
+            "pay": {
+                "price": {
+					#if ($mifid_price && $mifid_price != "")
+				        "value": $mifid_price,
+				        "isUserOverridden": true
+				    #else
+				    	"value": null
+				    #end
+				},
+				"priceType": {
+				    #if ($priceType)
+				        "value": "$priceType"
+						,"isUserOverridden": true
+				    #end
+				    				
+				},
+				"quoteUpfrontPaymentCcy": {				
+					#if ($upfrontPaymentCcy)
+						"value": "$upfrontPaymentCcy"
+						,"isUserOverridden": true
+					#end
+				},
+				"additionalTerms": {
+					#if ($additionalTerms)
+						"value": "$additionalTerms"
+						,"isUserOverridden": true
+					#end
+				},
+				"salesComment": {
+					#if($!utils.getValueAt('HEADER:SENTINEL:SALES_COMMENT', false, false, -1, -1))
+					    "value": "$!utils.getValueAt('HEADER:SENTINEL:SALES_COMMENT', false, false, -1, -1)",
+					    "isUserOverridden": true
+					#end
+				},
+				"markitwireTraders": {
+					#if ($markitwireTraderValue)
+                		"value": $utils.dictToJsonBoolean($markitwireTraderValue)
+    				#else
+    					"value": false                		
+	        		#end
+					,"isUserOverridden": true
+           		}
+            	#if($rateSpreadFields == 2) ## RatesFixedFloat, RatesFixedFloat0Coupon, RatesFixedFloatOis
+	            	,
+					"quoteQuoteConvention": {
+		                #if($quoteConvention)
+					        "value": "$quoteConvention",
+							"isUserOverridden": true
+					    #end
+		            },
+	            	"quoteFixedRateLeg1": {
+						#if ($quoteConvention && $quoteConvention == "FixedRate" && $quote_value)
+							"value": $quote_value
+							,"isUserOverridden": true
+						#end
+					},
+					"quoteFloatSpreadLeg2": {
+						#if ($quoteConvention && $quoteConvention == "FloatSpread" && $quote_value)
+							"value": $quote_value
+							,"isUserOverridden": true
+						#end
+					},
+					"quoteUpfrontPayment": {
+						 #if ($quoteConvention && $quoteConvention == "UpfrontPayment" && $quote_value)
+							"value": $quote_value
+							,"isUserOverridden": true
+						#end
+					}
+				#elseif($rateSpreadFields == 1) ## RatesFixedFixed
+					,
+					"quoteQuoteConvention": {
+		                #if($quoteConvention)
+					        "value": "$quoteConvention",
+							"isUserOverridden": true
+					    #end
+		            },
+	            	"quoteFixedRateLeg1": {
+						#if ($quoteConvention && $quoteConvention == "FixedRateLeg1" && $quote_value)
+							"value": $quote_value
+							,"isUserOverridden": true
+						#end
+					},
+					"quoteFixedRateLeg2": {
+						#if ($quoteConvention && $quoteConvention == "FixedRateLeg2" && $quote_value)
+							"value": $quote_value
+							,"isUserOverridden": true
+						#end
+					},
+					"quoteUpfrontPayment": {
+						 #if ($quoteConvention && $quoteConvention == "UpfrontPayment" && $quote_value)
+							"value": $quote_value
+							,"isUserOverridden": true
+						#end
+					}
+				#else ## RatesBasisOis, RatesBasis
+					,
+					"quoteQuoteConvention": {
+		                #if($quoteConvention)
+					        "value": "$quoteConvention",
+							"isUserOverridden": true
+					    #end
+		            },
+	            	"quoteFloatSpreadLeg1": {
+						#if ($quoteConvention && $quoteConvention == "FloatSpreadLeg1" && $quote_value)
+							"value": $quote_value
+							,"isUserOverridden": true
+						#end
+					},
+					"quoteFloatSpreadLeg2": {
+						#if ($quoteConvention && $quoteConvention == "FloatSpreadLeg2" && $quote_value)
+							"value": $quote_value
+							,"isUserOverridden": true
+						#end
+					},
+					"quoteUpfrontPayment": {
+						 #if ($quoteConvention && $quoteConvention == "UpfrontPayment" && $quote_value)
+							"value": $quote_value
+							,"isUserOverridden": true
+						#end
+					}
+				#end
+            }
+        #elseif ($sign == "RECEIVE")
+	        ## Receive params
+			#set ($quote_value = $!utils.getValueAt("HEADER:SENTINEL:FACE_PRICE", false, false, -1, -1))
+			#set ($mifid_price = $!utils.getValueAt("HEADER:SENTINEL:MIFID_PRICE", false, false, -1, -1))
+			#set ($priceType = $utils.getValueAt("HEADER:SENTINEL:MIFID_PRICE_TYPE", false, false, -1, -1))
+			#set ($upfrontPayment = $utils.getValueAt("HEADER:SENTINEL:UPFRONT_PAYMENT", true, false, -1, -1))
+			#set ($upfrontPaymentCcy = $utils.getValueAt("HEADER:SENTINEL:UPFRONT_PAYMENT_CCY", false, false, -1, -1))
+			#set ($additionalTerms = $utils.getValueAt("HEADER:SENTINEL:ADDITIONAL_TERMS", false, false, -1, -1))
+            "receive": {
+				"price": {
+					#if ($mifid_price && $mifid_price != "")
+				        "value": $mifid_price,
+				        "isUserOverridden": true
+				    #else
+				    	"value": null
+				    #end
+				},
+				"priceType": {
+				    #if ($priceType)
+				        "value": "$priceType"
+						,"isUserOverridden": true
+				    #end				
+				},
+				"quoteUpfrontPaymentCcy": {				
+					#if ($upfrontPaymentCcy)
+						"value": "$upfrontPaymentCcy"
+						,"isUserOverridden": true
+					#end
+				},
+				"additionalTerms": {
+					#if ($additionalTerms)
+						"value": "$additionalTerms"
+						,"isUserOverridden": true
+					#end
+				},
+				"salesComment": {
+					#if($!utils.getValueAt('HEADER:SENTINEL:SALES_COMMENT', false, false, -1, -1))
+					    "value": "$!utils.getValueAt('HEADER:SENTINEL:SALES_COMMENT', false, false, -1, -1)",
+					    "isUserOverridden": true
+					#end
+				},
+				"markitwireTraders": {
+					#if ($markitwireTraderValue)
+                		"value": $utils.dictToJsonBoolean($markitwireTraderValue)
+    				#else
+    					"value": false                		
+	        		#end
+	        		,"isUserOverridden": true
+           		}
+            	#if($rateSpreadFields == 2) ## RatesFixedFloat, RatesFixedFloat0Coupon, RatesFixedFloatOis
+	            	,
+					"quoteQuoteConvention": {
+		                #if($quoteConvention)
+					        "value": "$quoteConvention",
+							"isUserOverridden": true
+					    #end
+		            },
+	            	"quoteFixedRateLeg1": {
+						#if ($quoteConvention && $quoteConvention == "FixedRate" && $quote_value)
+							"value": $quote_value
+							,"isUserOverridden": true
+						#end
+					},
+					"quoteFloatSpreadLeg2": {
+						#if ($quoteConvention && $quoteConvention == "FloatSpread" && $quote_value)
+							"value": $quote_value
+							,"isUserOverridden": true
+						#end
+					},
+					"quoteUpfrontPayment": {
+						 #if ($quoteConvention && $quoteConvention == "UpfrontPayment" && $quote_value)
+							"value": $quote_value
+							,"isUserOverridden": true
+						#end
+					}
+				#elseif($rateSpreadFields == 1) ## RatesFixedFixed
+					,
+					"quoteQuoteConvention": {
+		                #if($quoteConvention)
+					        "value": "$quoteConvention",
+							"isUserOverridden": true
+					    #end
+		            },
+	            	"quoteFixedRateLeg1": {
+						#if ($quoteConvention && $quoteConvention == "FixedRateLeg1" && $quote_value)
+							"value": $quote_value
+							,"isUserOverridden": true
+						#end
+					},
+					"quoteFixedRateLeg2": {
+						#if ($quoteConvention && $quoteConvention == "FixedRateLeg2" && $quote_value)
+							"value": $quote_value
+							,"isUserOverridden": true
+						#end
+					},
+					"quoteUpfrontPayment": {
+						 #if ($quoteConvention && $quoteConvention == "UpfrontPayment" && $quote_value)
+							"value": $quote_value
+							,"isUserOverridden": true
+						#end
+					}
+				#else ## RatesBasisOis, RatesBasis
+					,
+					"quoteQuoteConvention": {
+		                #if($quoteConvention)
+					        "value": "$quoteConvention",
+							"isUserOverridden": true
+					    #end
+		            },
+	            	"quoteFloatSpreadLeg1": {
+						#if ($quoteConvention && $quoteConvention == "FloatSpreadLeg1" && $quote_value)
+							"value": $quote_value
+							,"isUserOverridden": true
+						#end
+					},
+					"quoteFloatSpreadLeg2": {
+						#if ($quoteConvention && $quoteConvention == "FloatSpreadLeg2" && $quote_value)
+							"value": $quote_value
+							,"isUserOverridden": true
+						#end
+					},
+					"quoteUpfrontPayment": {
+						 #if ($quoteConvention && $quoteConvention == "UpfrontPayment" && $quote_value)
+							"value": $quote_value
+							,"isUserOverridden": true
+						#end
+					}
+				#end
+			}
+        ## TWO WAY -> Just to test
+        #else
+	        ## Two way params
+	        #set ($quoteConvention_tw_pay = $!utils.getValueAt("HEADER:SENTINEL:QUOTE_TYPE", false, false, -1, -1))
+			#set ($quote_value_tw_pay = $!utils.getValueAt("HEADER:SENTINEL:BID_FACE_PRICE", false, false, -1, -1))
+			#set ($mifid_price_tw_pay = $!utils.getValueAt("HEADER:SENTINEL:BID_MIFID_PRICE", false, false, -1, -1))
+			#set ($priceType_tw_pay = $utils.getValueAt("HEADER:SENTINEL:BID_MIFID_PRICE_TYPE", false, false, -1, -1))
+			#set ($upfrontPayment_tw_pay = $utils.getValueAt("HEADER:SENTINEL:BID_UPFRONT_PAYMENT", true, false, -1, -1))
+			#set ($upfrontPaymentCcy_tw_pay = $utils.getValueAt("HEADER:SENTINEL:BID_UPFRONT_PAYMENT_CCY", false, false, -1, -1))
+			#set ($additionalTerms_tw_pay = $utils.getValueAt("HEADER:SENTINEL:BID_ADDITIONAL_TERMS", false, false, -1, -1))
+			#set ($quoteConvention_tw_rec = $!utils.getValueAt("HEADER:SENTINEL:QUOTE_TYPE", false, false, -1, -1))
+			#set ($quote_value_tw_rec = $!utils.getValueAt("HEADER:SENTINEL:ASK_FACE_PRICE", false, false, -1, -1))
+			#set ($mifid_price_tw_rec = $!utils.getValueAt("HEADER:SENTINEL:ASK_MIFID_PRICE", false, false, -1, -1))
+			#set ($priceType_tw_rec = $utils.getValueAt("HEADER:SENTINEL:ASK_MIFID_PRICE_TYPE", false, false, -1, -1))
+			#set ($upfrontPayment_tw_rec = $utils.getValueAt("HEADER:SENTINEL:ASK_UPFRONT_PAYMENT", true, false, -1, -1))
+			#set ($upfrontPaymentCcy_tw_rec = $utils.getValueAt("HEADER:SENTINEL:ASK_UPFRONT_PAYMENT_CCY", false, false, -1, -1))
+			#set ($additionalTerms_tw_rec = $utils.getValueAt("HEADER:SENTINEL:ASK_ADDITIONAL_TERMS", false, false, -1, -1))
+            "pay": {
+				"price": {
+					#if ($mifid_price_tw_pay && $mifid_price_tw_pay != "")
+				        "value": $mifid_price_tw_pay,
+				        "isUserOverridden": true
+				    #else
+				    	"value": null
+				    #end
+				},
+				"priceType": {
+				    #if ($priceType_tw_pay)
+				        "value": "$priceType_tw_pay"
+						,"isUserOverridden": true
+				    #end				
+				},
+				"quoteUpfrontPaymentCcy": {	
+					#if ($upfrontPaymentCcy_tw_pay)
+						"value": "$upfrontPaymentCcy_tw_pay"
+						,"isUserOverridden": true
+					#end
+				},
+				"additionalTerms": {
+					#if ($additionalTerms_tw_pay)
+						"value": "$additionalTerms_tw_pay"
+						,"isUserOverridden": true
+					#end
+				},
+				"salesComment": {
+					#if($!utils.getValueAt('HEADER:SENTINEL:SALES_COMMENT', false, false, -1, -1))
+					    "value": "$!utils.getValueAt('HEADER:SENTINEL:SALES_COMMENT', false, false, -1, -1)",
+					    "isUserOverridden": true
+					#end
+				},
+				"markitwireTraders": {
+					#if ($markitwireTraderValue)
+                		"value": $utils.dictToJsonBoolean($markitwireTraderValue)
+    				#else
+    					"value": false                		
+	        		#end
+					,"isUserOverridden": true
+           		}
+				#if($rateSpreadFields == 2) ## RatesFixedFloat, RatesFixedFloat0Coupon, RatesFixedFloatOis
+	            	,
+					"quoteQuoteConvention": {
+		                #if($quoteConvention_tw_pay)
+					        "value": "$quoteConvention_tw_pay",
+							"isUserOverridden": true
+					    #end
+		            },
+	            	"quoteFixedRateLeg1": {
+						#if ($quoteConvention_tw_pay && $quoteConvention_tw_pay == "FixedRate" && $quote_value_tw_pay)
+							"value": $quote_value_tw_pay
+							,"isUserOverridden": true
+						#end
+					},
+					"quoteFloatSpreadLeg2": {
+						#if ($quoteConvention_tw_pay && $quoteConvention_tw_pay == "FloatSpread" && $quote_value_tw_pay)
+							"value": $quote_value_tw_pay
+							,"isUserOverridden": true
+						#end
+					},
+					"quoteUpfrontPayment": {
+						 #if ($quoteConvention_tw_pay && $quoteConvention_tw_pay == "UpfrontPayment" && $quote_value_tw_pay)
+							"value": $quote_value_tw_pay
+							,"isUserOverridden": true
+						#end
+					}
+				#elseif($rateSpreadFields == 1) ## RatesFixedFixed
+					,
+					"quoteQuoteConvention": {
+		                #if($quoteConvention_tw_pay)
+					        "value": "$quoteConvention_tw_pay",
+							"isUserOverridden": true
+					    #end
+		            },
+	            	"quoteFixedRateLeg1": {
+						#if ($quoteConvention_tw_pay && $quoteConvention_tw_pay == "FixedRateLeg1" && $quote_value_tw_pay)
+							"value": $quote_value_tw_pay
+							,"isUserOverridden": true
+						#end
+					},
+					"quoteFixedRateLeg2": {
+						#if ($quoteConvention_tw_pay && $quoteConvention_tw_pay == "FixedRateLeg2" && $quote_value_tw_pay)
+							"value": $quote_value_tw_pay
+							,"isUserOverridden": true
+						#end
+					},
+					"quoteUpfrontPayment": {
+						 #if ($quoteConvention_tw_pay && $quoteConvention_tw_pay == "UpfrontPayment" && $quote_value_tw_pay)
+							"value": $quote_value_tw_pay
+							,"isUserOverridden": true
+						#end
+					}
+				#else ## RatesBasisOis, RatesBasis
+					,
+					"quoteQuoteConvention": {
+		                #if($quoteConvention_tw_pay)
+					        "value": "$quoteConvention_tw_pay",
+							"isUserOverridden": true
+					    #end
+		            },
+	            	"quoteFloatSpreadLeg1": {
+						#if ($quoteConvention_tw_pay && $quoteConvention_tw_pay == "FloatSpreadLeg1" && $quote_value_tw_pay)
+							"value": $quote_value_tw_pay
+							,"isUserOverridden": true
+						#end
+					},
+					"quoteFloatSpreadLeg2": {
+						#if ($quoteConvention_tw_pay && $quoteConvention_tw_pay == "FloatSpreadLeg2" && $quote_value_tw_pay)
+							"value": $quote_value_tw_pay
+							,"isUserOverridden": true
+						#end
+					},
+					"quoteUpfrontPayment": {
+						 #if ($quoteConvention_tw_pay && $quoteConvention_tw_pay == "UpfrontPayment" && $quote_value_tw_pay)
+							"value": $quote_value_tw_pay
+							,"isUserOverridden": true
+						#end
+					}
+				#end
+			},
+			"receive": {
+				"price": {
+					#if ($mifid_price_tw_rec && $mifid_price_tw_rec != "")
+				        "value": $mifid_price_tw_rec,
+				        "isUserOverridden": true
+				    #else
+				    	"value": null
+				    #end
+				},
+				"priceType": {
+				    #if ($priceType_tw_rec)
+				        "value": "$priceType_tw_rec"
+						,"isUserOverridden": true
+				    #end				
+				},
+				"quoteUpfrontPaymentCcy": {
+					#if ($upfrontPaymentCcy_tw_rec)
+						"value": "$upfrontPaymentCcy_tw_rec"
+						,"isUserOverridden": true
+					#end
+				},
+				"additionalTerms": {
+					#if ($additionalTerms_tw_rec)
+						"value": "$additionalTerms_tw_rec"
+						,"isUserOverridden": true
+					#end
+				},
+				"salesComment": {
+					#if($!utils.getValueAt('HEADER:SENTINEL:SALES_COMMENT', false, false, -1, -1))
+					    "value": "$!utils.getValueAt('HEADER:SENTINEL:SALES_COMMENT', false, false, -1, -1)",
+					    "isUserOverridden": true
+					#end
+				},
+				"markitwireTraders": {
+					#if ($markitwireTraderValue)
+                		"value": $utils.dictToJsonBoolean($markitwireTraderValue)
+    				#else
+    					"value": false                		
+	        		#end
+					,"isUserOverridden": true
+           		}
+            	#if($rateSpreadFields == 2) ## RatesFixedFloat, RatesFixedFloat0Coupon, RatesFixedFloatOis
+	            	,
+					"quoteQuoteConvention": {
+		                #if($quoteConvention_tw_rec)
+					        "value": "$quoteConvention_tw_rec",
+							"isUserOverridden": true
+					    #end
+		            },
+	            	"quoteFixedRateLeg1": {
+						#if ($quoteConvention_tw_rec && $quoteConvention_tw_rec == "FixedRate" && $quote_value_tw_rec)
+							"value": $quote_value_tw_rec
+							,"isUserOverridden": true
+						#end
+					},
+					"quoteFloatSpreadLeg2": {
+						#if ($quoteConvention_tw_rec && $quoteConvention_tw_rec == "FloatSpread" && $quote_value_tw_rec)
+							"value": $quote_value_tw_rec
+							,"isUserOverridden": true
+						#end
+					},
+					"quoteUpfrontPayment": {
+						 #if ($quoteConvention_tw_rec && $quoteConvention_tw_rec == "UpfrontPayment" && $quote_value_tw_rec)
+							"value": $quote_value_tw_rec
+							,"isUserOverridden": true
+						#end
+					}
+				#elseif($rateSpreadFields == 1) ## RatesFixedFixed
+					,
+					"quoteQuoteConvention": {
+		                #if($quoteConvention_tw_rec)
+					        "value": "$quoteConvention_tw_rec",
+							"isUserOverridden": true
+					    #end
+		            },
+	            	"quoteFixedRateLeg1": {
+						#if ($quoteConvention_tw_rec && $quoteConvention_tw_rec == "FixedRateLeg1" && $quote_value_tw_rec)
+							"value": $quote_value_tw_rec
+							,"isUserOverridden": true
+						#end
+					},
+					"quoteFixedRateLeg2": {
+						#if ($quoteConvention_tw_rec && $quoteConvention_tw_rec == "FixedRateLeg2" && $quote_value_tw_rec)
+							"value": $quote_value_tw_rec
+							,"isUserOverridden": true
+						#end
+					},
+					"quoteUpfrontPayment": {
+						 #if ($quoteConvention_tw_rec && $quoteConvention_tw_rec == "UpfrontPayment" && $quote_value_tw_rec)
+							"value": $quote_value_tw_rec
+							,"isUserOverridden": true
+						#end
+					}
+				#else ## RatesBasisOis, RatesBasis
+					,
+					"quoteQuoteConvention": {
+		                #if($quoteConvention_tw_rec)
+					        "value": "$quoteConvention_tw_rec",
+							"isUserOverridden": true
+					    #end
+		            },
+	            	"quoteFloatSpreadLeg1": {
+						#if ($quoteConvention_tw_rec && $quoteConvention_tw_rec == "FloatSpreadLeg1" && $quote_value_tw_rec)
+							"value": $quote_value_tw_rec
+							,"isUserOverridden": true
+						#end
+					},
+					"quoteFloatSpreadLeg2": {
+						#if ($quoteConvention_tw_rec && $quoteConvention_tw_rec == "FloatSpreadLeg2" && $quote_value_tw_rec)
+							"value": $quote_value_tw_rec
+							,"isUserOverridden": true
+						#end
+					},
+					"quoteUpfrontPayment": {
+						 #if ($quoteConvention_tw_rec && $quoteConvention_tw_rec == "UpfrontPayment" && $quote_value_tw_rec)
+							"value": $quote_value_tw_rec
+							,"isUserOverridden": true
+						#end
+					}
+				#end
+			}
+        #end
+    },
+    "ttlInMillis": $timeout 
+    
+    #set($template = "templates/sentinel/COMMON/ATTACHMENT.vm") 
+	#parse($template)
+    

@@ -1,0 +1,14 @@
+{
+	"id": "123",
+	"version": 22,
+	"markup": {
+		"receive": {
+			"xva": {
+				"value": 0
+			},
+			"sales": {
+				"value": 0
+			}
+		}
+	}
+}

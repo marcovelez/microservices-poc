@@ -1,0 +1,23 @@
+{
+	"id": "59",
+	"price": {
+		"pay": {
+			"price": {
+				"value": 11
+			},
+			"priceType": {
+				"value": "M"
+			},
+			"upfrontPayment": {
+				"value": 2
+			},
+			"upfrontPaymentCcy": {
+				"value": "USD"
+			},
+			"additionalTerms": {
+				"value": "3"
+			}
+		}
+	},
+	"ttlInMillis": 900000
+}

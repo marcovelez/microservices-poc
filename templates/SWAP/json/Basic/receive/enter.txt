@@ -1,0 +1,88 @@
+{
+	"counterpartyId": "1",
+	"notes": "TODO NO NOTES YET",
+	"product": {
+		"header": {
+			"productClass": "Rates",
+			"templateName": "RatesBasis",
+			"templateVersion": 1,
+			"isStandard": false,
+			"legs": {
+				"first": {
+					"templateName": "RatesBasisLeg",
+					"templateVersion": 1,
+					"isStandard": false,
+					"legs": {}
+				},
+				"other": {
+					"templateName": "RatesBasisLeg",
+					"templateVersion": 1,
+					"isStandard": false,
+					"legs": {}
+				}
+			}
+		},
+		"body": {
+			"notionalCurrency": {
+				"value": "USD",
+				"isUserOverridden": true
+			},
+			"expiryDate": {
+				"value": "2017-09-30T00:00:00.000Z",
+				"isUserOverridden": true
+			},
+			"notionalSchedule": {},
+			"attachment": {},
+			"level": {},
+			"underlyingAssetType": {},
+			"singleOrMultiCurrency": {},
+			"deliveryType": {},
+			"isinStatus": {},
+			"version": {},
+			"parent": {},
+			"isin": {},
+			"fullName": {},
+			"cfi": {},
+			"commodityDerivativeIndicator": {},
+			"issuerOrOperatorOfTradingVenueId": {},
+			"fisn": {},
+			"priceMultiplier": {},
+			"isoReferenceRate": {},
+			"isoOtherLegReferenceRate": {},
+			"legs": {
+				"first": {
+					"referenceRate": {},
+					"referenceRateTerm": {},
+					"legs": {}
+				},
+				"other": {
+					"referenceRate": {},
+					"referenceRateTerm": {},
+					"legs": {}
+				}
+			}
+		}
+	},
+	"productType": "RatesBasis",
+	"economics": {
+		"header": {
+			"templateName": "RatesBasis",
+			"templateVersion": 1
+		},
+		"body": {
+			"notional": 11,
+			"payReceive": "Receive",
+			"legs": [
+				{
+					"notional": 11,
+					"payReceive": "Receive"
+				},
+				{
+					"notional": 11,
+					"payReceive": "Pay"
+				}
+			]
+		}
+	},
+	"requestedQuoteType": "Firm"
+}

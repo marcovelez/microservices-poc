@@ -1,0 +1,114 @@
+{
+	"id": "18",
+	"notes": "TODO NO NOTES YET",
+	"product": {
+		"header": {
+			"productClass": "Rates",
+			"templateName": "RatesBasis",
+			"templateVersion": 1,
+			"isStandard": false,
+			"legs": {
+				"first": {
+					"templateName": "RatesBasisLeg",
+					"templateVersion": 1,
+					"isStandard": false,
+					"legs": {}
+				},
+				"other": {
+					"templateName": "RatesBasisLeg",
+					"templateVersion": 1,
+					"isStandard": false,
+					"legs": {}
+				}
+			}
+		},
+		"body": {
+			"expiryDate": {
+				"value": "2017-09-30T00:00:00.000Z",
+				"isUserOverridden": true
+			},
+			"notionalCurrency": {
+				"value": "USD",
+				"isUserOverridden": true
+			},
+			"notionalSchedule": {
+				"value": "C",
+				"isUserOverridden": true
+			},
+			"deliveryType": {},
+			"priceMultiplier": {},
+			"tenor": {},
+			"attachment": {},
+			"level": {},
+			"underlyingAssettype": {},
+			"singleOrMultiCurrency": {},
+			"isinStatus": {},
+			"version": {},
+			"parent": {},
+			"isin": {},
+			"fullName": {},
+			"cfi": {},
+			"commodityDerivativeIndicator": {},
+			"issuerOrOperatorOfTradingVenueId": {},
+			"fisn": {},
+			"isoReferenceRate": {},
+			"isoOtherLegReferenceRate": {},
+			"legs": {
+				"first": {
+					"referenceRate": {
+						"value": "AUD-LIBOR-BBA",
+						"isUserOverridden": true
+					},
+					"referenceRateTerm": {
+						"value": "1Y",
+						"isUserOverridden": true
+					},
+					"legs": {}
+				},
+				"other": {
+					"referenceRate": {
+						"value": "CHF-LIBOR-BBA",
+						"isUserOverridden": true
+					},
+					"referenceRateTerm": {
+						"value": "1Y",
+						"isUserOverridden": true
+					},
+					"legs": {}
+				}
+			}
+		}
+	},
+	"economics": {
+		"notional": 11,
+		"payReceive": "Receive",
+		"legs": [
+			{
+				"notional": 11,
+				"payReceive": "Receive",
+				"legs": []
+			},
+			{
+				"notional": 11,
+				"payReceive": "Pay",
+				"legs": []
+			}
+		]
+	},
+	"price": {
+		"receive": {
+			"price": {},
+			"priceType": {
+				"value": "P"
+			},
+			"upfrontPayment": {},
+			"upfrontPaymentCcy": {
+				"value": "USD"
+			},
+			"additionalTerms": {},
+			"quantity": {
+				"value": 1
+			}
+		}
+	}
+}

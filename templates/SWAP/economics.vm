@@ -1,0 +1,48 @@
+#set($notional = $!utils.getValueAt("PRODUCTS:PRODUCT_:REQUEST:DEAL:LEGS:LEG_:LOAN_CAPITAL", false, true, $product, 1))
+#set($sign = $!utils.getValueAt('HEADER:SENTINEL:PAY_RECEIVE', false, true, -1, -1))
+"notional":  $utils.abs_double($notional, "%.0f"),
+#if ($sign == "RECEIVE")
+    "payReceive": "RECEIVE",
+    "legs": [
+        {
+            "notional": $utils.abs_double($notional, "%.0f"),
+            "payReceive": "RECEIVE",
+            "weight": -1
+        },
+        {
+            "notional": $utils.abs_double($notional, "%.0f"),
+            "payReceive": "PAY",
+            "weight": 1
+        }
+    ]
+##PAY or Deprecated -> TwoWay
+#elseif ($sign == "PAY")
+    "payReceive": "PAY",
+    "legs": [
+        {
+            "notional": $utils.abs_double($notional, "%.0f"),
+            "payReceive": "PAY",
+            "weight": 1
+        },
+        {
+            "notional": $utils.abs_double($notional, "%.0f"),
+            "payReceive": "RECEIVE",
+            "weight": -1
+        }
+    ]
+##two way    
+#else 
+    "payReceive": "TWOWAY",
+    "legs": [
+        {
+            "notional": $utils.abs_double($notional, "%.0f"),
+            "payReceive": "PAY",
+            "weight": 1
+        },
+        {
+            "notional": $utils.abs_double($notional, "%.0f"),
+            "payReceive": "RECEIVE",
+            "weight": -1
+        }
+    ]
+#end

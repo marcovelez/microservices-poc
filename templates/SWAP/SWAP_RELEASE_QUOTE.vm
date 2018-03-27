@@ -1,0 +1,1133 @@
+## PRODUCTS [IRS] GENERIC
+#set ($sign = $!utils.getValueAt('HEADER:SENTINEL:PAY_RECEIVE', false, false, -1, -1))
+#set ($sales_bid = $!utils.getValueAt('HEADER:SENTINEL:QUOTE_CONVENTION:bid_mifid2markup', false, false, -1, -1))
+#set ($xva_bid = $!utils.getValueAt('HEADER:SENTINEL:QUOTE_CONVENTION:bid_mifid2xva', false, false, -1, -1))
+#set ($sales_ask = $!utils.getValueAt('HEADER:SENTINEL:QUOTE_CONVENTION:ask_mifid2markup', false, false, -1, -1))
+#set ($xva_ask = $!utils.getValueAt('HEADER:SENTINEL:QUOTE_CONVENTION:ask_mifid2xva', false, false, -1, -1))
+#set ($quoteConvention = $!utils.getValueAt("HEADER:SENTINEL:QUOTE_TYPE", false, false, -1, -1))
+
+    "salespersonId" : "$userId",
+    "rfqId" : "$rfqId",
+    "rfqVersion": $rfqVersionId,
+    "markup": {
+		#if ($sign == "PAY")
+			##Quote Conventions values variables - PAY
+            "pay": {
+            	"staPrice": {
+	 				#if($data.get("sub_product")=="RatesBasisOis" || $data.get("sub_product") == "RatesBasis")
+	 					#set ($staPrice = $!utils.getValueAt("HEADER:SENTINEL:QUOTE_CONVENTION:bid_quoteFloatSpreadLeg1", false, false, -1, -1))
+	 				#else
+	 					#set ($staPrice = $!utils.getValueAt("HEADER:SENTINEL:QUOTE_CONVENTION:bid_quoteFixedRateLeg1", false, false, -1, -1))
+	 				#end
+					#if ($staPrice)
+						"value": $!utils.formatDouble($staPrice, 10)
+						,"isUserOverridden": true
+					#end
+     			},
+				#set ($priceType = $utils.getValueAt("HEADER:SENTINEL:QUOTE_CONVENTION:bid_mifid2finalPriceType", false, false, -1, -1))
+	            "staFinalPriceType": {
+	                #if ($priceType)
+				        "value": "$priceType"
+						,"isUserOverridden": true
+			    	#end
+	            },
+	            "staFinalPriceCcy": {},
+	            #set ($upfrontPaymentCCy = $utils.getValueAt("HEADER:SENTINEL:QUOTE_CONVENTION:bid_finalUpfrontPaymentCCY", false, false, -1, -1))
+	            "staUpfrontPaymentCcy": {
+	            	#if ($upfrontPaymentCCy)
+				        "value": "$upfrontPaymentCCy"
+						,"isUserOverridden": true
+			    	#end
+	            },
+				"priceBreakdown": {
+					"value": 0 ## TODO: falta mapeo de IL
+				},
+				"markupDivider1": {
+	                "value": " " ## TODO: falta mapeo de IL
+	            },
+	            "markupDivider2": {
+	                "value": " " ## TODO: falta mapeo de IL
+	            },
+	            #set ($xvaUpfrontPayment = $!utils.getValueAt('HEADER:SENTINEL:QUOTE_CONVENTION:bid_xvaUpfrontPayment', false, false, -1, -1))
+	            "xvaUpfrontPayment": {##Upfront XVA
+	                #if($xvaUpfrontPayment)
+						"value": $xvaUpfrontPayment
+					#else
+						"value": 0
+					#end
+					,"isUserOverridden": true
+	            },
+	            #set ($markupUpfrontPayment = $!utils.getValueAt('HEADER:SENTINEL:QUOTE_CONVENTION:bid_markupUpfrontPayment', false, false, -1, -1))
+	            "markupUpfrontPayment": {##Upfront Markup
+	                #if($markupUpfrontPayment)
+						"value": $markupUpfrontPayment
+					#else
+						"value": 0
+					#end
+					,"isUserOverridden": true
+	            },
+	            #set ($cncUpfrontPayment = $!utils.getValueAt('HEADER:SENTINEL:QUOTE_CONVENTION:bid_cncUpfrontPayment', false, false, -1, -1))
+	            "cncUpfrontPayment": {##Upfront Costs/Charges
+	                #if($cncUpfrontPayment)
+						"value": $cncUpfrontPayment
+					#else
+						"value": 0
+					#end
+					,"isUserOverridden": true
+	            },
+	            #set ($finalUpfrontPayment = $!utils.getValueAt('HEADER:SENTINEL:QUOTE_CONVENTION:bid_finalUpfrontPayment', false, false, -1, -1))
+	            "finalUpfrontPayment": {##Final Upfront Payment
+	                #if($finalUpfrontPayment)
+						"value": $finalUpfrontPayment
+					#else
+						"value": 0
+					#end
+					,"isUserOverridden": true
+	            },
+	            "markupDivider3": {
+	                "value": " " ## TODO: falta mapeo de IL
+	            },
+	            #set ($stafinalPrice = $!utils.getValueAt('HEADER:SENTINEL:QUOTE_CONVENTION:bid_mifid2finalPrice', false, false, -1, -1))
+            	"staFinalPrice": {##MiFID2 Final Price                
+	            	#if($stafinalPrice)
+						"value": $!utils.formatDouble($stafinalPrice, 10)
+					#else
+						"value": 0
+					#end
+					,"isUserOverridden": true
+	            },
+	            #set ($staUpfrontPayment = $!utils.getValueAt('HEADER:SENTINEL:QUOTE_CONVENTION:bid_finalUpfrontPayment', false, false, -1, -1))
+	            "staUpfrontPayment": {##MiFID2 Upfront
+	                #if($staUpfrontPayment)
+						"value": $!utils.formatDouble($staUpfrontPayment, 10)
+					#else
+						"value": 0
+					#end
+					,"isUserOverridden": true
+	            },
+	            "xva": {##MiFID2 XVA
+	                #if($xva_bid)
+						"value": $xva_bid
+					#else
+						"value": 0
+					#end
+					,"isUserOverridden": true
+	            },
+	            "sales": {##MiFID2 Markup
+	                #if($sales_bid)
+						"value": $sales_bid
+					#else
+						"value": 0
+					#end
+					,"isUserOverridden": true
+	            }
+				#if ($data.get("sub_product")=="RatesBasis" || $data.get("sub_product")=="RatesBasisOis")
+					#set ($xvaFloatSpreadLeg1 = $!utils.getValueAt('HEADER:SENTINEL:QUOTE_CONVENTION:bid_xvaFloatSpreadLeg1', false, false, -1, -1))
+					,"xvaFloatSpreadLeg1": {##Float Spread XVA
+						#if($xvaFloatSpreadLeg1)
+							"value": $xvaFloatSpreadLeg1
+						#else
+							"value": 0
+						#end
+						,"isUserOverridden": true
+					},
+					#set ($markupFloatSpreadLeg1 = $!utils.getValueAt('HEADER:SENTINEL:QUOTE_CONVENTION:bid_markupFloatSpreadLeg1', false, false, -1, -1))
+					"markupFloatSpreadLeg1": {##Float Spread Markup
+		                #if($markupFloatSpreadLeg1)
+							"value": $markupFloatSpreadLeg1
+						#else
+							"value": 0
+						#end
+						,"isUserOverridden": true
+		            },
+		            #set ($cncFloatSpreadLeg1 = $!utils.getValueAt('HEADER:SENTINEL:QUOTE_CONVENTION:bid_cncFloatSpreadLeg1', false, false, -1, -1))
+                    "cncFloatSpreadLeg1": {##Float Spread Costs/Charges
+		                #if($cncFloatSpreadLeg1)
+							"value": $cncFloatSpreadLeg1
+						#else
+							"value": 0
+						#end
+						,"isUserOverridden": true
+		            },
+		            #set ($finalFloatSpreadLeg1 = $!utils.getValueAt('HEADER:SENTINEL:QUOTE_CONVENTION:bid_finalFloatSpreadLeg1', false, false, -1, -1))
+		            "finalFloatSpreadLeg1": {##Final Float Spread
+		                #if($finalFloatSpreadLeg1)
+							"value": $finalFloatSpreadLeg1
+						#else
+							"value": 0
+						#end
+						,"isUserOverridden": true
+		            }
+				#elseif($data.get("sub_product")=="RatesFixedFloatOis" || $data.get("sub_product")=="RatesFixedFloat" || $data.get("sub_product")=="RatesFixedFloat0Coupon" || $data.get("sub_product")=="RatesFixedFixed")
+					#set ($xvaFixedRateLeg1 = $!utils.getValueAt('HEADER:SENTINEL:QUOTE_CONVENTION:bid_xvaFixedRateLeg1', false, false, -1, -1))
+					,"xvaFixedRateLeg1": {##Fixed Rate XVA
+						#if($xvaFixedRateLeg1)
+							"value": $xvaFixedRateLeg1
+						#else
+							"value": 0
+						#end
+						,"isUserOverridden": true
+					},
+					#set ($markupFixedRateLeg1 = $!utils.getValueAt('HEADER:SENTINEL:QUOTE_CONVENTION:bid_markupFixedRateLeg1', false, false, -1, -1))
+					"markupFixedRateLeg1": {##Fixed Rate Markup
+		                #if($markupFixedRateLeg1)
+							"value": $markupFixedRateLeg1
+						#else
+							"value": 0
+						#end
+						,"isUserOverridden": true
+		            },
+		            #set ($cncFixedRateLeg1 = $!utils.getValueAt('HEADER:SENTINEL:QUOTE_CONVENTION:bid_cncFixedRateLeg1', false, false, -1, -1))
+		            "cncFixedRateLeg1": {##Fixed Rate Costs/Charges
+		                #if($cncFixedRateLeg1)
+							"value": $cncFixedRateLeg1
+						#else
+							"value": 0
+						#end
+						,"isUserOverridden": true
+		            },
+		            #set ($finalFixedRateLeg1 = $!utils.getValueAt('HEADER:SENTINEL:QUOTE_CONVENTION:bid_finalFixedRateLeg1', false, false, -1, -1))
+		            "finalFixedRateLeg1": {##Final Fixed Rate
+		                #if($finalFixedRateLeg1)
+							"value": $finalFixedRateLeg1
+						#else
+							"value": 0
+						#end
+						,"isUserOverridden": true
+		            },
+		            #set ($staFirstLegFixed = $!utils.getValueAt('HEADER:SENTINEL:QUOTE_CONVENTION:bid_finalFixedRateLeg1', false, false, -1, -1))
+		            "staFirstLegFixed": {##MiFID2 1st Leg Fixed
+		                #if($staFirstLegFixed)
+							"value": $!utils.formatDouble($staFirstLegFixed, 10)
+						#else
+							"value": 0
+						#end
+						,"isUserOverridden": true
+		            }
+		        #end
+		        #if ($data.get("sub_product")=="RatesFixedFixed")
+		        	#set ($xvaFixedRateLeg2 = $!utils.getValueAt('HEADER:SENTINEL:QUOTE_CONVENTION:bid_xvaFixedRateLeg2', false, false, -1, -1))
+					,"xvaFixedRateLeg2": {##Fixed Rate 2 XVA
+		                 #if($xvaFixedRateLeg2)
+							"value": $xvaFixedRateLeg2
+						#else
+							"value": 0
+						#end
+						,"isUserOverridden": true
+		            },
+		            #set ($markupFixedRateLeg2 = $!utils.getValueAt('HEADER:SENTINEL:QUOTE_CONVENTION:bid_markupFixedRateLeg2', false, false, -1, -1))
+                    "markupFixedRateLeg2": {##Fixed Rate 2 Markup
+		                #if($markupFixedRateLeg2)
+							"value": $markupFixedRateLeg2
+						#else
+							"value": 0
+						#end
+						,"isUserOverridden": true
+		            },
+		            #set ($cncFixedRateLeg2 = $!utils.getValueAt('HEADER:SENTINEL:QUOTE_CONVENTION:bid_cncFixedRateLeg2', false, false, -1, -1))
+		            "cncFixedRateLeg2": {##Fixed Rate 2 Costs/Charges
+		                #if($cncFixedRateLeg2)
+							"value": $cncFixedRateLeg2
+						#else
+							"value": 0
+						#end
+						,"isUserOverridden": true
+		            },
+		            #set ($finalFixedRateLeg2 = $!utils.getValueAt('HEADER:SENTINEL:QUOTE_CONVENTION:bid_finalFixedRateLeg2', false, false, -1, -1))
+		            "finalFixedRateLeg2": {##Final Fixed Rate 2
+		                #if($finalFixedRateLeg2)
+							"value": $finalFixedRateLeg2
+						#else
+							"value": 0
+						#end
+						,"isUserOverridden": true
+		            },
+		            #set ($staOtherLegFixed = $!utils.getValueAt('HEADER:SENTINEL:QUOTE_CONVENTION:bid_finalFixedRateLeg2', false, false, -1, -1))
+            		"staOtherLegFixed": {##MiFID2 2nd Leg Fixed
+		                #if($staOtherLegFixed)
+							"value": $!utils.formatDouble($staOtherLegFixed, 10)
+						#else
+							"value": 0
+						#end
+						,"isUserOverridden": true
+		            }
+				#else
+					#set ($xvaFloatSpreadLeg2 = $!utils.getValueAt('HEADER:SENTINEL:QUOTE_CONVENTION:bid_xvaFloatSpreadLeg2', false, false, -1, -1))
+					,"xvaFloatSpreadLeg2": {##Float Spread 2 XVA
+		                #if($xvaFloatSpreadLeg2)
+							"value": $xvaFloatSpreadLeg2
+						#else
+							"value": 0
+						#end
+						,"isUserOverridden": true
+		            },
+		            #set ($markupFloatSpreadLeg2 = $!utils.getValueAt('HEADER:SENTINEL:QUOTE_CONVENTION:bid_markupFloatSpreadLeg2', false, false, -1, -1))
+		            "markupFloatSpreadLeg2": {##Float Spread 2 Markup
+		                #if($markupFloatSpreadLeg2)
+							"value": $markupFloatSpreadLeg2
+						#else
+							"value": 0
+						#end
+						,"isUserOverridden": true
+		            },
+		            #set ($cncFloatSpreadLeg2 = $!utils.getValueAt('HEADER:SENTINEL:QUOTE_CONVENTION:bid_cncFloatSpreadLeg2', false, false, -1, -1))
+		            "cncFloatSpreadLeg2": {##Float Spread 2 Costs/Charges
+		                #if($cncFloatSpreadLeg2)
+							"value": $cncFloatSpreadLeg2
+						#else
+							"value": 0
+						#end
+						,"isUserOverridden": true
+		            },
+		            #set ($finalFloatSpreadLeg2 = $!utils.getValueAt('HEADER:SENTINEL:QUOTE_CONVENTION:bid_finalFloatSpreadLeg2', false, false, -1, -1))
+                    "finalFloatSpreadLeg2": {##Final Float Spread 2
+		                #if($finalFloatSpreadLeg2)
+							"value": $finalFloatSpreadLeg2
+						#else
+							"value": 0
+						#end
+						,"isUserOverridden": true
+		            }
+				#end
+			}
+		#elseif ($sign == "RECEIVE")
+			##Quote Conventions values variables - RECEIVE
+            "receive": {
+     			"staPrice": {
+     				#if($data.get("sub_product")=="RatesBasisOis" || $data.get("sub_product") == "RatesBasis")
+	 					#set ($staPrice = $!utils.getValueAt("HEADER:SENTINEL:QUOTE_CONVENTION:ask_quoteFloatSpreadLeg1", false, false, -1, -1))
+	 				#else
+	 					#set ($staPrice = $!utils.getValueAt("HEADER:SENTINEL:QUOTE_CONVENTION:ask_quoteFixedRateLeg1", false, false, -1, -1))
+	 				#end
+					#if ($staPrice)
+						"value": $!utils.formatDouble($staPrice, 10)
+						,"isUserOverridden": true
+					#end
+     			},
+				#set ($priceType = $utils.getValueAt("HEADER:SENTINEL:QUOTE_CONVENTION:ask_mifid2finalPriceType", false, false, -1, -1))
+	            "staFinalPriceType": {
+	                #if ($priceType)
+				        "value": "$priceType"
+						,"isUserOverridden": true
+			    	#end
+	            },
+	            "staFinalPriceCcy": {},
+	            #set ($upfrontPaymentCCy = $utils.getValueAt("HEADER:SENTINEL:QUOTE_CONVENTION:ask_finalUpfrontPaymentCCY", false, false, -1, -1))
+	            "staUpfrontPaymentCcy": {
+	            	#if ($upfrontPaymentCCy)
+				        "value": "$upfrontPaymentCCy"
+						,"isUserOverridden": true
+			    	#end
+	            },
+				"priceBreakdown": {
+					"value": 0 ## TODO: falta mapeo de IL
+				},
+				"markupDivider1": {
+	                "value": " " ## TODO: falta mapeo de IL
+	            },
+	            "markupDivider2": {
+	                "value": " " ## TODO: falta mapeo de IL
+	            },
+	            #set ($xvaUpfrontPayment = $!utils.getValueAt('HEADER:SENTINEL:QUOTE_CONVENTION:ask_xvaUpfrontPayment', false, false, -1, -1))
+	            "xvaUpfrontPayment": {##Upfront XVA
+	                #if($xvaUpfrontPayment)
+						"value": $xvaUpfrontPayment
+					#else
+						"value": 0
+					#end
+					,"isUserOverridden": true
+	            },
+	            #set ($markupUpfrontPayment = $!utils.getValueAt('HEADER:SENTINEL:QUOTE_CONVENTION:ask_markupUpfrontPayment', false, false, -1, -1))
+	            "markupUpfrontPayment": {##Upfront Markup
+	                #if($markupUpfrontPayment)
+						"value": $markupUpfrontPayment
+					#else
+						"value": 0
+					#end
+					,"isUserOverridden": true
+	            },
+	            #set ($cncUpfrontPayment = $!utils.getValueAt('HEADER:SENTINEL:QUOTE_CONVENTION:ask_cncUpfrontPayment', false, false, -1, -1))
+	            "cncUpfrontPayment": {##Upfront Costs/Charges
+	                #if($cncUpfrontPayment)
+						"value": $cncUpfrontPayment
+					#else
+						"value": 0
+					#end
+					,"isUserOverridden": true
+	            },
+	            #set ($finalUpfrontPayment = $!utils.getValueAt('HEADER:SENTINEL:QUOTE_CONVENTION:ask_finalUpfrontPayment', false, false, -1, -1))
+	            "finalUpfrontPayment": {##Final Upfront Payment
+	                #if($finalUpfrontPayment)
+						"value": $finalUpfrontPayment
+					#else
+						"value": 0
+					#end
+					,"isUserOverridden": true
+	            },
+	            "markupDivider3": {
+	                "value": " " ## TODO: falta mapeo de IL
+	            },
+	            #set ($stafinalPrice = $!utils.getValueAt('HEADER:SENTINEL:QUOTE_CONVENTION:ask_mifid2finalPrice', false, false, -1, -1))
+            	"staFinalPrice": {##MiFID2 Final Price                
+	            	#if($stafinalPrice)
+						"value": $!utils.formatDouble($stafinalPrice, 10)
+					#else
+						"value": 0
+					#end
+					,"isUserOverridden": true
+	            },
+	            #set ($staUpfrontPayment = $!utils.getValueAt('HEADER:SENTINEL:QUOTE_CONVENTION:ask_finalUpfrontPayment', false, false, -1, -1))
+	            "staUpfrontPayment": {##MiFID2 Upfront
+	                #if($staUpfrontPayment)
+						"value": $!utils.formatDouble($staUpfrontPayment, 10)
+					#else
+						"value": 0
+					#end
+					,"isUserOverridden": true
+	            },
+	            "xva": {##MiFID2 XVA
+	                #if($xva_ask)
+						"value": $xva_ask
+					#else
+						"value": 0
+					#end
+					,"isUserOverridden": true
+	            },
+	            "sales": {##MiFID2 Markup
+	                #if($sales_ask)
+						"value": $sales_ask
+					#else
+						"value": 0
+					#end
+					,"isUserOverridden": true
+	            }
+				#if ($data.get("sub_product")=="RatesBasis" || $data.get("sub_product")=="RatesBasisOis")
+					#set ($xvaFloatSpreadLeg1 = $!utils.getValueAt('HEADER:SENTINEL:QUOTE_CONVENTION:ask_xvaFloatSpreadLeg1', false, false, -1, -1))
+					,"xvaFloatSpreadLeg1": {##Float Spread XVA
+						#if($xvaFloatSpreadLeg1)
+							"value": $xvaFloatSpreadLeg1
+						#else
+							"value": 0
+						#end
+						,"isUserOverridden": true
+					},
+					#set ($markupFloatSpreadLeg1 = $!utils.getValueAt('HEADER:SENTINEL:QUOTE_CONVENTION:ask_markupFloatSpreadLeg1', false, false, -1, -1))
+					"markupFloatSpreadLeg1": {##Float Spread Markup
+		                #if($markupFloatSpreadLeg1)
+							"value": $markupFloatSpreadLeg1
+						#else
+							"value": 0
+						#end
+						,"isUserOverridden": true
+		            },
+		            #set ($cncFloatSpreadLeg1 = $!utils.getValueAt('HEADER:SENTINEL:QUOTE_CONVENTION:ask_cncFloatSpreadLeg1', false, false, -1, -1))
+                    "cncFloatSpreadLeg1": {##Float Spread Costs/Charges
+		                #if($cncFloatSpreadLeg1)
+							"value": $cncFloatSpreadLeg1
+						#else
+							"value": 0
+						#end
+						,"isUserOverridden": true
+		            },
+		            #set ($finalFloatSpreadLeg1 = $!utils.getValueAt('HEADER:SENTINEL:QUOTE_CONVENTION:ask_finalFloatSpreadLeg1', false, false, -1, -1))
+		            "finalFloatSpreadLeg1": {##Final Float Spread
+		                #if($finalFloatSpreadLeg1)
+							"value": $finalFloatSpreadLeg1
+						#else
+							"value": 0
+						#end
+						,"isUserOverridden": true
+		            }
+				#elseif($data.get("sub_product")=="RatesFixedFloatOis" || $data.get("sub_product")=="RatesFixedFloat" || $data.get("sub_product")=="RatesFixedFloat0Coupon" || $data.get("sub_product")=="RatesFixedFixed")
+					#set ($xvaFixedRateLeg1 = $!utils.getValueAt('HEADER:SENTINEL:QUOTE_CONVENTION:ask_xvaFixedRateLeg1', false, false, -1, -1))
+					,"xvaFixedRateLeg1": {##Fixed Rate XVA
+						#if($xvaFixedRateLeg1)
+							"value": $xvaFixedRateLeg1
+						#else
+							"value": 0
+						#end
+						,"isUserOverridden": true
+					},
+					#set ($markupFixedRateLeg1 = $!utils.getValueAt('HEADER:SENTINEL:QUOTE_CONVENTION:ask_markupFixedRateLeg1', false, false, -1, -1))
+					"markupFixedRateLeg1": {##Fixed Rate Markup
+		                #if($markupFixedRateLeg1)
+							"value": $markupFixedRateLeg1
+						#else
+							"value": 0
+						#end
+						,"isUserOverridden": true
+		            },
+		            #set ($cncFixedRateLeg1 = $!utils.getValueAt('HEADER:SENTINEL:QUOTE_CONVENTION:ask_cncFixedRateLeg1', false, false, -1, -1))
+		            "cncFixedRateLeg1": {##Fixed Rate Costs/Charges
+		                #if($cncFixedRateLeg1)
+							"value": $cncFixedRateLeg1
+						#else
+							"value": 0
+						#end
+						,"isUserOverridden": true
+		            },
+		            #set ($finalFixedRateLeg1 = $!utils.getValueAt('HEADER:SENTINEL:QUOTE_CONVENTION:ask_finalFixedRateLeg1', false, false, -1, -1))
+		            "finalFixedRateLeg1": {##Final Fixed Rate
+		                #if($finalFixedRateLeg1)
+							"value": $finalFixedRateLeg1
+						#else
+							"value": 0
+						#end
+						,"isUserOverridden": true
+		            },
+		            #set ($staFirstLegFixed = $!utils.getValueAt('HEADER:SENTINEL:QUOTE_CONVENTION:ask_finalFixedRateLeg1', false, false, -1, -1))
+		            "staFirstLegFixed": {##MiFID2 1st Leg Fixed
+		                #if($staFirstLegFixed)
+							"value": $!utils.formatDouble($staFirstLegFixed, 10)
+						#else
+							"value": 0
+						#end
+						,"isUserOverridden": true
+		            }
+		        #end
+		        #if ($data.get("sub_product")=="RatesFixedFixed")
+					#set ($xvaFixedRateLeg2 = $!utils.getValueAt('HEADER:SENTINEL:QUOTE_CONVENTION:ask_xvaFixedRateLeg2', false, false, -1, -1))
+					,"xvaFixedRateLeg2": {##Fixed Rate 2 XVA
+		                 #if($xvaFixedRateLeg2)
+							"value": $xvaFixedRateLeg2
+						#else
+							"value": 0
+						#end
+						,"isUserOverridden": true
+		            },
+		            #set ($markupFixedRateLeg2 = $!utils.getValueAt('HEADER:SENTINEL:QUOTE_CONVENTION:ask_markupFixedRateLeg2', false, false, -1, -1))
+                    "markupFixedRateLeg2": {##Fixed Rate 2 Markup
+		                #if($markupFixedRateLeg2)
+							"value": $markupFixedRateLeg2
+						#else
+							"value": 0
+						#end
+						,"isUserOverridden": true
+		            },
+		            #set ($cncFixedRateLeg2 = $!utils.getValueAt('HEADER:SENTINEL:QUOTE_CONVENTION:ask_cncFixedRateLeg2', false, false, -1, -1))
+		            "cncFixedRateLeg2": {##Fixed Rate 2 Costs/Charges
+		                #if($cncFixedRateLeg2)
+							"value": $cncFixedRateLeg2
+						#else
+							"value": 0
+						#end
+						,"isUserOverridden": true
+		            },
+		            #set ($finalFixedRateLeg2 = $!utils.getValueAt('HEADER:SENTINEL:QUOTE_CONVENTION:ask_finalFixedRateLeg2', false, false, -1, -1))
+		            "finalFixedRateLeg2": {##Final Fixed Rate 2
+		                #if($finalFixedRateLeg2)
+							"value": $finalFixedRateLeg2
+						#else
+							"value": 0
+						#end
+						,"isUserOverridden": true
+		            },
+		            #set ($staOtherLegFixed = $!utils.getValueAt('HEADER:SENTINEL:QUOTE_CONVENTION:ask_finalFixedRateLeg2', false, false, -1, -1))
+            		"staOtherLegFixed": {##MiFID2 2nd Leg Fixed
+		                #if($staOtherLegFixed)
+							"value": $!utils.formatDouble($staOtherLegFixed, 10)
+						#else
+							"value": 0
+						#end
+						,"isUserOverridden": true
+		            }
+				#else
+					#set ($xvaFloatSpreadLeg2 = $!utils.getValueAt('HEADER:SENTINEL:QUOTE_CONVENTION:ask_xvaFloatSpreadLeg2', false, false, -1, -1))
+					,"xvaFloatSpreadLeg2": {##Float Spread 2 XVA
+		                #if($xvaFloatSpreadLeg2)
+							"value": $xvaFloatSpreadLeg2
+						#else
+							"value": 0
+						#end
+						,"isUserOverridden": true
+		            },
+		            #set ($markupFloatSpreadLeg2 = $!utils.getValueAt('HEADER:SENTINEL:QUOTE_CONVENTION:ask_markupFloatSpreadLeg2', false, false, -1, -1))
+		            "markupFloatSpreadLeg2": {##Float Spread 2 Markup
+		                #if($markupFloatSpreadLeg2)
+							"value": $markupFloatSpreadLeg2
+						#else
+							"value": 0
+						#end
+						,"isUserOverridden": true
+		            },
+		            #set ($cncFloatSpreadLeg2 = $!utils.getValueAt('HEADER:SENTINEL:QUOTE_CONVENTION:ask_cncFloatSpreadLeg2', false, false, -1, -1))
+		            "cncFloatSpreadLeg2": {##Float Spread 2 Costs/Charges
+		                #if($cncFloatSpreadLeg2)
+							"value": $cncFloatSpreadLeg2
+						#else
+							"value": 0
+						#end
+						,"isUserOverridden": true
+		            },
+		            #set ($finalFloatSpreadLeg2 = $!utils.getValueAt('HEADER:SENTINEL:QUOTE_CONVENTION:ask_finalFloatSpreadLeg2', false, false, -1, -1))
+                    "finalFloatSpreadLeg2": {##Final Float Spread 2
+		                #if($finalFloatSpreadLeg2)
+							"value": $finalFloatSpreadLeg2
+						#else
+							"value": 0
+						#end
+						,"isUserOverridden": true
+		            }
+				#end
+			}
+		#else
+			##Quote Conventions values variables - TWO WAY PAY
+            "pay": {
+     			"staPrice": {
+     				#if($data.get("sub_product")=="RatesBasisOis" || $data.get("sub_product") == "RatesBasis")
+	 					#set ($staPrice = $!utils.getValueAt("HEADER:SENTINEL:QUOTE_CONVENTION:bid_quoteFloatSpreadLeg1", false, false, -1, -1))
+	 				#else
+	 					#set ($staPrice = $!utils.getValueAt("HEADER:SENTINEL:QUOTE_CONVENTION:bid_quoteFixedRateLeg1", false, false, -1, -1))
+	 				#end
+					#if ($staPrice)
+						"value": $!utils.formatDouble($staPrice, 10)
+						,"isUserOverridden": true
+					#end
+     			},
+				#set ($priceType = $utils.getValueAt("HEADER:SENTINEL:QUOTE_CONVENTION:bid_mifid2finalPriceType", false, false, -1, -1))
+	            "staFinalPriceType": {
+	                #if ($priceType)
+				        "value": "$priceType"
+						,"isUserOverridden": true
+			    	#end
+	            },
+	            "staFinalPriceCcy": {},
+	            #set ($upfrontPaymentCCy = $utils.getValueAt("HEADER:SENTINEL:QUOTE_CONVENTION:bid_finalUpfrontPaymentCCY", false, false, -1, -1))
+	            "staUpfrontPaymentCcy": {
+	            	#if ($upfrontPaymentCCy)
+				        "value": "$upfrontPaymentCCy"
+						,"isUserOverridden": true
+			    	#end
+	            },
+				"priceBreakdown": {
+					"value": 0 ## TODO: falta mapeo de IL
+				},
+				"markupDivider1": {
+	                "value": " " ## TODO: falta mapeo de IL
+	            },
+	            "markupDivider2": {
+	                "value": " " ## TODO: falta mapeo de IL
+	            },
+	            #set ($xvaUpfrontPayment = $!utils.getValueAt('HEADER:SENTINEL:QUOTE_CONVENTION:bid_xvaUpfrontPayment', false, false, -1, -1))
+	            "xvaUpfrontPayment": {##Upfront XVA
+	                #if($xvaUpfrontPayment)
+						"value": $xvaUpfrontPayment
+					#else
+						"value": 0
+					#end
+					,"isUserOverridden": true
+	            },
+	            #set ($markupUpfrontPayment = $!utils.getValueAt('HEADER:SENTINEL:QUOTE_CONVENTION:bid_markupUpfrontPayment', false, false, -1, -1))
+	            "markupUpfrontPayment": {##Upfront Markup
+	                #if($markupUpfrontPayment)
+						"value": $markupUpfrontPayment
+					#else
+						"value": 0
+					#end
+					,"isUserOverridden": true
+	            },
+	           	#set ($cncUpfrontPayment = $!utils.getValueAt('HEADER:SENTINEL:QUOTE_CONVENTION:bid_cncUpfrontPayment', false, false, -1, -1))
+	            "cncUpfrontPayment": {##Upfront Costs/Charges
+	                #if($cncUpfrontPayment)
+						"value": $cncUpfrontPayment
+					#else
+						"value": 0
+					#end
+					,"isUserOverridden": true
+	            },
+	            #set ($finalUpfrontPayment = $!utils.getValueAt('HEADER:SENTINEL:QUOTE_CONVENTION:bid_finalUpfrontPayment', false, false, -1, -1))
+	            "finalUpfrontPayment": {##Final Upfront Payment
+	                #if($finalUpfrontPayment)
+						"value": $finalUpfrontPayment
+					#else
+						"value": 0
+					#end
+					,"isUserOverridden": true
+	            },
+	            "markupDivider3": {
+	                "value": " " ## TODO: falta mapeo de IL
+	            },
+	            #set ($stafinalPrice = $!utils.getValueAt('HEADER:SENTINEL:QUOTE_CONVENTION:bid_mifid2finalPrice', false, false, -1, -1))
+            	"staFinalPrice": {##MiFID2 Final Price
+	                #if($stafinalPrice)
+						"value": $!utils.formatDouble($stafinalPrice, 10)
+					#else
+						"value": 0
+					#end
+					,"isUserOverridden": true
+	            },
+	            #set ($staUpfrontPayment = $!utils.getValueAt('HEADER:SENTINEL:QUOTE_CONVENTION:bid_finalUpfrontPayment', false, false, -1, -1))
+	            "staUpfrontPayment": {##MiFID2 Upfront
+	                #if($staUpfrontPayment)
+						"value": $!utils.formatDouble($staUpfrontPayment, 10)
+					#else
+						"value": 0
+					#end
+					,"isUserOverridden": true
+	            },
+	            "xva": {##MiFID2 XVA
+	                #if($xva_bid)
+						"value": $xva_bid
+					#else
+						"value": 0
+					#end
+					,"isUserOverridden": true
+	            },
+	            "sales": {##MiFID2 Markup
+	                #if($sales_bid)
+						"value": $sales_bid
+					#else
+						"value": 0
+					#end
+					,"isUserOverridden": true
+	            }
+				#if ($data.get("sub_product")=="RatesBasis" || $data.get("sub_product")=="RatesBasisOis")
+					#set ($xvaFloatSpreadLeg1 = $!utils.getValueAt('HEADER:SENTINEL:QUOTE_CONVENTION:bid_xvaFloatSpreadLeg1', false, false, -1, -1))
+					,"xvaFloatSpreadLeg1": {##Float Spread XVA
+						#if($xvaFloatSpreadLeg1)
+							"value": $xvaFloatSpreadLeg1
+						#else
+							"value": 0
+						#end
+						,"isUserOverridden": true
+					},
+					#set ($markupFloatSpreadLeg1 = $!utils.getValueAt('HEADER:SENTINEL:QUOTE_CONVENTION:bid_markupFloatSpreadLeg1', false, false, -1, -1))
+					"markupFloatSpreadLeg1": {##Float Spread Markup
+		                #if($markupFloatSpreadLeg1)
+							"value": $markupFloatSpreadLeg1
+						#else
+							"value": 0
+						#end
+						,"isUserOverridden": true
+		            },
+		            #set ($cncFloatSpreadLeg1 = $!utils.getValueAt('HEADER:SENTINEL:QUOTE_CONVENTION:bid_cncFloatSpreadLeg1', false, false, -1, -1))
+                    "cncFloatSpreadLeg1": {##Float Spread Costs/Charges
+		                #if($cncFloatSpreadLeg1)
+							"value": $cncFloatSpreadLeg1
+						#else
+							"value": 0
+						#end
+						,"isUserOverridden": true
+		            },
+		            #set ($finalFloatSpreadLeg1 = $!utils.getValueAt('HEADER:SENTINEL:QUOTE_CONVENTION:bid_finalFloatSpreadLeg1', false, false, -1, -1))
+		            "finalFloatSpreadLeg1": {##Final Float Spread
+		                #if($finalFloatSpreadLeg1)
+							"value": $finalFloatSpreadLeg1
+						#else
+							"value": 0
+						#end
+						,"isUserOverridden": true
+		            }
+				#elseif($data.get("sub_product")=="RatesFixedFloatOis" || $data.get("sub_product")=="RatesFixedFloat" || $data.get("sub_product")=="RatesFixedFloat0Coupon" || $data.get("sub_product")=="RatesFixedFixed")
+					#set ($xvaFixedRateLeg1 = $!utils.getValueAt('HEADER:SENTINEL:QUOTE_CONVENTION:bid_xvaFixedRateLeg1', false, false, -1, -1))
+					,"xvaFixedRateLeg1": {##Fixed Rate XVA
+						#if($xvaFixedRateLeg1)
+							"value": $xvaFixedRateLeg1
+						#else
+							"value": 0
+						#end
+						,"isUserOverridden": true
+					},
+					#set ($markupFixedRateLeg1 = $!utils.getValueAt('HEADER:SENTINEL:QUOTE_CONVENTION:bid_markupFixedRateLeg1', false, false, -1, -1))
+					"markupFixedRateLeg1": {##Fixed Rate Markup
+		                #if($markupFixedRateLeg1)
+							"value": $markupFixedRateLeg1
+						#else
+							"value": 0
+						#end
+						,"isUserOverridden": true
+		            },
+		            #set ($cncFixedRateLeg1 = $!utils.getValueAt('HEADER:SENTINEL:QUOTE_CONVENTION:bid_cncFixedRateLeg1', false, false, -1, -1))
+		            "cncFixedRateLeg1": {##Fixed Rate Costs/Charges
+		                #if($cncFixedRateLeg1)
+							"value": $cncFixedRateLeg1
+						#else
+							"value": 0
+						#end
+						,"isUserOverridden": true
+		            },
+		            #set ($finalFixedRateLeg1 = $!utils.getValueAt('HEADER:SENTINEL:QUOTE_CONVENTION:bid_finalFixedRateLeg1', false, false, -1, -1))
+		            "finalFixedRateLeg1": {##Final Fixed Rate
+		                #if($finalFixedRateLeg1)
+							"value": $finalFixedRateLeg1
+						#else
+							"value": 0
+						#end
+						,"isUserOverridden": true
+		            },
+		            #set ($staFirstLegFixed = $!utils.getValueAt('HEADER:SENTINEL:QUOTE_CONVENTION:bid_finalFixedRateLeg1', false, false, -1, -1))
+		            "staFirstLegFixed": {##MiFID2 1st Leg Fixed
+		                #if($staFirstLegFixed)
+							"value": $!utils.formatDouble($staFirstLegFixed, 10)
+						#else
+							"value": 0
+						#end
+						,"isUserOverridden": true
+		            }
+		        #end
+		        #if ($data.get("sub_product")=="RatesFixedFixed")
+					#set ($xvaFixedRateLeg2 = $!utils.getValueAt('HEADER:SENTINEL:QUOTE_CONVENTION:bid_xvaFixedRateLeg2', false, false, -1, -1))
+					,"xvaFixedRateLeg2": {##Fixed Rate 2 XVA
+		                 #if($xvaFixedRateLeg2)
+							"value": $xvaFixedRateLeg2
+						#else
+							"value": 0
+						#end
+						,"isUserOverridden": true
+		            },
+		            #set ($markupFixedRateLeg2 = $!utils.getValueAt('HEADER:SENTINEL:QUOTE_CONVENTION:bid_markupFixedRateLeg2', false, false, -1, -1))
+                    "markupFixedRateLeg2": {##Fixed Rate 2 Markup
+		                #if($markupFixedRateLeg2)
+							"value": $markupFixedRateLeg2
+						#else
+							"value": 0
+						#end
+						,"isUserOverridden": true
+		            },
+		            #set ($cncFixedRateLeg2 = $!utils.getValueAt('HEADER:SENTINEL:QUOTE_CONVENTION:bid_cncFixedRateLeg2', false, false, -1, -1))
+		            "cncFixedRateLeg2": {##Fixed Rate 2 Costs/Charges
+		                #if($cncFixedRateLeg2)
+							"value": $cncFixedRateLeg2
+						#else
+							"value": 0
+						#end
+						,"isUserOverridden": true
+		            },
+		            #set ($finalFixedRateLeg2 = $!utils.getValueAt('HEADER:SENTINEL:QUOTE_CONVENTION:bid_finalFixedRateLeg2', false, false, -1, -1))
+		            "finalFixedRateLeg2": {##Final Fixed Rate 2
+		                #if($finalFixedRateLeg2)
+							"value": $finalFixedRateLeg2
+						#else
+							"value": 0
+						#end
+						,"isUserOverridden": true
+		            },
+		            #set ($staOtherLegFixed = $!utils.getValueAt('HEADER:SENTINEL:QUOTE_CONVENTION:bid_finalFixedRateLeg2', false, false, -1, -1))
+            		"staOtherLegFixed": {##MiFID2 2nd Leg Fixed
+		                #if($staOtherLegFixed)
+							"value": $!utils.formatDouble($staOtherLegFixed, 10)
+						#else
+							"value": 0
+						#end
+						,"isUserOverridden": true
+		            }
+				#else
+					#set ($xvaFloatSpreadLeg2 = $!utils.getValueAt('HEADER:SENTINEL:QUOTE_CONVENTION:bid_xvaFloatSpreadLeg2', false, false, -1, -1))
+					,"xvaFloatSpreadLeg2": {##Float Spread 2 XVA
+		                #if($xvaFloatSpreadLeg2)
+							"value": $xvaFloatSpreadLeg2
+						#else
+							"value": 0
+						#end
+						,"isUserOverridden": true
+		            },
+		            #set ($markupFloatSpreadLeg2 = $!utils.getValueAt('HEADER:SENTINEL:QUOTE_CONVENTION:bid_markupFloatSpreadLeg2', false, false, -1, -1))
+		            "markupFloatSpreadLeg2": {##Float Spread 2 Markup
+		                #if($markupFloatSpreadLeg2)
+							"value": $markupFloatSpreadLeg2
+						#else
+							"value": 0
+						#end
+						,"isUserOverridden": true
+		            },
+		            #set ($cncFloatSpreadLeg2 = $!utils.getValueAt('HEADER:SENTINEL:QUOTE_CONVENTION:bid_cncFloatSpreadLeg2', false, false, -1, -1))
+		            "cncFloatSpreadLeg2": {##Float Spread 2 Costs/Charges
+		                #if($cncFloatSpreadLeg2)
+							"value": $cncFloatSpreadLeg2
+						#else
+							"value": 0
+						#end
+						,"isUserOverridden": true
+		            },
+		            #set ($finalFloatSpreadLeg2 = $!utils.getValueAt('HEADER:SENTINEL:QUOTE_CONVENTION:bid_finalFloatSpreadLeg2', false, false, -1, -1))
+                    "finalFloatSpreadLeg2": {##Final Float Spread 2
+		                #if($finalFloatSpreadLeg2)
+							"value": $finalFloatSpreadLeg2
+						#else
+							"value": 0
+						#end
+						,"isUserOverridden": true
+		            }
+				#end
+			},
+			##Quote Conventions values variables - TWO WAY RECEIVE
+            "receive": {
+     			"staPrice": {
+     				#if($data.get("sub_product")=="RatesBasisOis" || $data.get("sub_product") == "RatesBasis")
+	 					#set ($staPrice = $!utils.getValueAt("HEADER:SENTINEL:QUOTE_CONVENTION:ask_quoteFloatSpreadLeg1", false, false, -1, -1))
+	 				#else
+	 					#set ($staPrice = $!utils.getValueAt("HEADER:SENTINEL:QUOTE_CONVENTION:ask_quoteFixedRateLeg1", false, false, -1, -1))
+	 				#end
+					#if ($staPrice)
+						"value": $!utils.formatDouble($staPrice, 10)
+						,"isUserOverridden": true
+					#end
+     			},
+				#set ($priceType = $utils.getValueAt("HEADER:SENTINEL:QUOTE_CONVENTION:ask_mifid2finalPriceType", false, false, -1, -1))
+	            "staFinalPriceType": {
+	                #if ($priceType)
+				        "value": "$priceType"
+						,"isUserOverridden": true
+			    	#end
+	            },
+	            "staFinalPriceCcy": {},
+	            #set ($upfrontPaymentCCy = $utils.getValueAt("HEADER:SENTINEL:QUOTE_CONVENTION:ask_finalUpfrontPaymentCCY", false, false, -1, -1))
+	            "staUpfrontPaymentCcy": {
+	            	#if ($upfrontPaymentCCy)
+				        "value": "$upfrontPaymentCCy"
+						,"isUserOverridden": true
+			    	#end
+	            },
+				"priceBreakdown": {
+					"value": 0 ## TODO: falta mapeo de IL
+				},
+				"markupDivider1": {
+	                "value": " " ## TODO: falta mapeo de IL
+	            },
+	            "markupDivider2": {
+	                "value": " " ## TODO: falta mapeo de IL
+	            },
+	            #set ($xvaUpfrontPayment = $!utils.getValueAt('HEADER:SENTINEL:QUOTE_CONVENTION:ask_xvaUpfrontPayment', false, false, -1, -1))
+	            "xvaUpfrontPayment": {##Upfront XVA
+	                #if($xvaUpfrontPayment)
+						"value": $xvaUpfrontPayment
+					#else
+						"value": 0
+					#end
+					,"isUserOverridden": true
+	            },
+	            #set ($markupUpfrontPayment = $!utils.getValueAt('HEADER:SENTINEL:QUOTE_CONVENTION:ask_markupUpfrontPayment', false, false, -1, -1))
+	            "markupUpfrontPayment": {##Upfront Markup
+	                #if($markupUpfrontPayment)
+						"value": $markupUpfrontPayment
+					#else
+						"value": 0
+					#end
+					,"isUserOverridden": true
+	            },
+	            #set ($cncUpfrontPayment = $!utils.getValueAt('HEADER:SENTINEL:QUOTE_CONVENTION:ask_cncUpfrontPayment', false, false, -1, -1))
+	            "cncUpfrontPayment": {##Upfront Costs/Charges
+	                #if($cncUpfrontPayment)
+						"value": $cncUpfrontPayment
+					#else
+						"value": 0
+					#end
+					,"isUserOverridden": true
+	            },
+	            #set ($finalUpfrontPayment = $!utils.getValueAt('HEADER:SENTINEL:QUOTE_CONVENTION:ask_finalUpfrontPayment', false, false, -1, -1))
+	            "finalUpfrontPayment": {##Final Upfront Payment
+	                #if($finalUpfrontPayment)
+						"value": $finalUpfrontPayment
+					#else
+						"value": 0
+					#end
+					,"isUserOverridden": true
+	            },
+	            "markupDivider3": {
+	                "value": " " ## TODO: falta mapeo de IL
+	            },
+	            #set ($stafinalPrice = $!utils.getValueAt('HEADER:SENTINEL:QUOTE_CONVENTION:ask_mifid2finalPrice', false, false, -1, -1))
+            	"staFinalPrice": {##MiFID2 Final Price
+	                #if($stafinalPrice)
+						"value": $!utils.formatDouble($stafinalPrice, 10)
+					#else
+						"value": 0
+					#end
+					,"isUserOverridden": true
+	            },
+	            #set ($staUpfrontPayment = $!utils.getValueAt('HEADER:SENTINEL:QUOTE_CONVENTION:ask_finalUpfrontPayment', false, false, -1, -1))
+	            "staUpfrontPayment": {##MiFID2 Upfront
+	                #if($staUpfrontPayment)
+						"value": $!utils.formatDouble($staUpfrontPayment, 10)
+					#else
+						"value": 0
+					#end
+					,"isUserOverridden": true
+	            },
+	            "xva": {##MiFID2 XVA
+	                #if($xva_ask)
+						"value": $xva_ask
+					#else
+						"value": 0
+					#end
+					,"isUserOverridden": true
+	            },
+	            "sales": {##MiFID2 Markup
+	                #if($sales_ask)
+						"value": $sales_ask
+					#else
+						"value": 0
+					#end
+					,"isUserOverridden": true
+	            }
+				#if ($data.get("sub_product")=="RatesBasis" || $data.get("sub_product")=="RatesBasisOis")
+					#set ($xvaFloatSpreadLeg1 = $!utils.getValueAt('HEADER:SENTINEL:QUOTE_CONVENTION:ask_xvaFloatSpreadLeg1', false, false, -1, -1))
+					,"xvaFloatSpreadLeg1": {##Float Spread XVA
+						#if($xvaFloatSpreadLeg1)
+							"value": $xvaFloatSpreadLeg1
+						#else
+							"value": 0
+						#end
+						,"isUserOverridden": true
+					},
+					#set ($markupFloatSpreadLeg1 = $!utils.getValueAt('HEADER:SENTINEL:QUOTE_CONVENTION:ask_markupFloatSpreadLeg1', false, false, -1, -1))
+					"markupFloatSpreadLeg1": {##Float Spread Markup
+		                #if($markupFloatSpreadLeg1)
+							"value": $markupFloatSpreadLeg1
+						#else
+							"value": 0
+						#end
+						,"isUserOverridden": true
+		            },
+		            #set ($cncFloatSpreadLeg1 = $!utils.getValueAt('HEADER:SENTINEL:QUOTE_CONVENTION:ask_cncFloatSpreadLeg1', false, false, -1, -1))
+                    "cncFloatSpreadLeg1": {##Float Spread Costs/Charges
+		                #if($cncFloatSpreadLeg1)
+							"value": $cncFloatSpreadLeg1
+						#else
+							"value": 0
+						#end
+						,"isUserOverridden": true
+		            },
+		            #set ($finalFloatSpreadLeg1 = $!utils.getValueAt('HEADER:SENTINEL:QUOTE_CONVENTION:ask_finalFloatSpreadLeg1', false, false, -1, -1))
+		            "finalFloatSpreadLeg1": {##Final Float Spread
+		                #if($finalFloatSpreadLeg1)
+							"value": $finalFloatSpreadLeg1
+						#else
+							"value": 0
+						#end
+						,"isUserOverridden": true
+		            }
+				#elseif($data.get("sub_product")=="RatesFixedFloatOis" || $data.get("sub_product")=="RatesFixedFloat" || $data.get("sub_product")=="RatesFixedFloat0Coupon" || $data.get("sub_product")=="RatesFixedFixed")
+					#set ($xvaFixedRateLeg1 = $!utils.getValueAt('HEADER:SENTINEL:QUOTE_CONVENTION:ask_xvaFixedRateLeg1', false, false, -1, -1))
+					,"xvaFixedRateLeg1": {##Fixed Rate XVA
+						#if($xvaFixedRateLeg1)
+							"value": $xvaFixedRateLeg1
+						#else
+							"value": 0
+						#end
+						,"isUserOverridden": true
+					},
+					#set ($markupFixedRateLeg1 = $!utils.getValueAt('HEADER:SENTINEL:QUOTE_CONVENTION:ask_markupFixedRateLeg1', false, false, -1, -1))
+					"markupFixedRateLeg1": {##Fixed Rate Markup
+		                #if($markupFixedRateLeg1)
+							"value": $markupFixedRateLeg1
+						#else
+							"value": 0
+						#end
+						,"isUserOverridden": true
+		            },
+		            #set ($cncFixedRateLeg1 = $!utils.getValueAt('HEADER:SENTINEL:QUOTE_CONVENTION:ask_cncFixedRateLeg1', false, false, -1, -1))
+		            "cncFixedRateLeg1": {##Fixed Rate Costs/Charges
+		                #if($cncFixedRateLeg1)
+							"value": $cncFixedRateLeg1
+						#else
+							"value": 0
+						#end
+						,"isUserOverridden": true
+		            },
+		            #set ($finalFixedRateLeg1 = $!utils.getValueAt('HEADER:SENTINEL:QUOTE_CONVENTION:ask_finalFixedRateLeg1', false, false, -1, -1))
+		            "finalFixedRateLeg1": {##Final Fixed Rate
+		                #if($finalFixedRateLeg1)
+							"value": $finalFixedRateLeg1
+						#else
+							"value": 0
+						#end
+						,"isUserOverridden": true
+		            },
+		            #set ($staFirstLegFixed = $!utils.getValueAt('HEADER:SENTINEL:QUOTE_CONVENTION:ask_finalFixedRateLeg1', false, false, -1, -1))
+		            "staFirstLegFixed": {##MiFID2 1st Leg Fixed
+		                #if($staFirstLegFixed)
+							"value": $!utils.formatDouble($staFirstLegFixed, 10)
+						#else
+							"value": 0
+						#end
+						,"isUserOverridden": true
+		            }
+		        #end
+		        #if ($data.get("sub_product")=="RatesFixedFixed")
+					#set ($xvaFixedRateLeg2 = $!utils.getValueAt('HEADER:SENTINEL:QUOTE_CONVENTION:ask_xvaFixedRateLeg2', false, false, -1, -1))
+					,"xvaFixedRateLeg2": {##Fixed Rate 2 XVA
+		                 #if($xvaFixedRateLeg2)
+							"value": $xvaFixedRateLeg2
+						#else
+							"value": 0
+						#end
+						,"isUserOverridden": true
+		            },
+		            #set ($markupFixedRateLeg2 = $!utils.getValueAt('HEADER:SENTINEL:QUOTE_CONVENTION:ask_markupFixedRateLeg2', false, false, -1, -1))
+                    "markupFixedRateLeg2": {##Fixed Rate 2 Markup
+		                #if($markupFixedRateLeg2)
+							"value": $markupFixedRateLeg2
+						#else
+							"value": 0
+						#end
+						,"isUserOverridden": true
+		            },
+		            #set ($cncFixedRateLeg2 = $!utils.getValueAt('HEADER:SENTINEL:QUOTE_CONVENTION:ask_cncFixedRateLeg2', false, false, -1, -1))
+		            "cncFixedRateLeg2": {##Fixed Rate 2 Costs/Charges
+		                #if($cncFixedRateLeg2)
+							"value": $cncFixedRateLeg2
+						#else
+							"value": 0
+						#end
+						,"isUserOverridden": true
+		            },
+		            #set ($finalFixedRateLeg2 = $!utils.getValueAt('HEADER:SENTINEL:QUOTE_CONVENTION:ask_finalFixedRateLeg2', false, false, -1, -1))
+		            "finalFixedRateLeg2": {##Final Fixed Rate 2
+		                #if($finalFixedRateLeg2)
+							"value": $finalFixedRateLeg2
+						#else
+							"value": 0
+						#end
+						,"isUserOverridden": true
+		            },
+		            #set ($staOtherLegFixed = $!utils.getValueAt('HEADER:SENTINEL:QUOTE_CONVENTION:bid_finalFixedRateLeg2', false, false, -1, -1))
+            		"staOtherLegFixed": {##MiFID2 2nd Leg Fixed
+		                #if($staOtherLegFixed)
+							"value": $!utils.formatDouble($staOtherLegFixed, 10)
+						#else
+							"value": 0
+						#end
+						,"isUserOverridden": true
+		            }
+				#else
+					#set ($xvaFloatSpreadLeg2 = $!utils.getValueAt('HEADER:SENTINEL:QUOTE_CONVENTION:ask_xvaFloatSpreadLeg2', false, false, -1, -1))
+					,"xvaFloatSpreadLeg2": {##Float Spread 2 XVA
+		                #if($xvaFloatSpreadLeg2)
+							"value": $xvaFloatSpreadLeg2
+						#else
+							"value": 0
+						#end
+						,"isUserOverridden": true
+		            },
+		            #set ($markupFloatSpreadLeg2 = $!utils.getValueAt('HEADER:SENTINEL:QUOTE_CONVENTION:ask_markupFloatSpreadLeg2', false, false, -1, -1))
+		            "markupFloatSpreadLeg2": {##Float Spread 2 Markup
+		                #if($markupFloatSpreadLeg2)
+							"value": $markupFloatSpreadLeg2
+						#else
+							"value": 0
+						#end
+						,"isUserOverridden": true
+		            },
+		            #set ($cncFloatSpreadLeg2 = $!utils.getValueAt('HEADER:SENTINEL:QUOTE_CONVENTION:ask_cncFloatSpreadLeg2', false, false, -1, -1))
+		            "cncFloatSpreadLeg2": {##Float Spread 2 Costs/Charges
+		                #if($cncFloatSpreadLeg2)
+							"value": $cncFloatSpreadLeg2
+						#else
+							"value": 0
+						#end
+						,"isUserOverridden": true
+		            },
+		            #set ($finalFloatSpreadLeg2 = $!utils.getValueAt('HEADER:SENTINEL:QUOTE_CONVENTION:ask_finalFloatSpreadLeg2', false, false, -1, -1))
+                    "finalFloatSpreadLeg2": {##Final Float Spread 2
+		                #if($finalFloatSpreadLeg2)
+							"value": $finalFloatSpreadLeg2
+						#else
+							"value": 0
+						#end
+						,"isUserOverridden": true
+		            }
+				#end
+			}
+		#end
+	}

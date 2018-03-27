@@ -1,0 +1,26 @@
+{
+	"id": "6",
+	"price": {
+		"pay": {
+			"price": {
+				"value": 1
+			},
+			"priceType": {
+				"value": "P"
+			},
+			"upfrontPayment": {
+				"value": 2
+			},
+			"upfrontPaymentCcy": {
+				"value": "USD"
+			},
+			"additionalTerms": {
+				"value": "1"
+			},
+			"quantity": {
+				"value": 1
+			}
+		}
+	},
+	"ttlInMillis": 900000
+}

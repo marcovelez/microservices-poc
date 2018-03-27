@@ -1,0 +1,261 @@
+#set ($markitwireSalesValue = $!utils.getValueAt("HEADER:SENTINEL:SEND_TO_MARKIT", false, false, -1, -1))
+#set ($quoteConvention = $!utils.getValueAt("HEADER:SENTINEL:QUOTE_TYPE", false, false, -1, -1))
+#set ($collateralCurrencyValue = $utils.getValueAt("PRODUCTS:PRODUCT_:HEADER:SENTINEL:COLLATERAL_CCY", true, false, $product, -1))
+#set ($collateralValue = $utils.getValueAt("PRODUCTS:PRODUCT_:HEADER:SENTINEL:COLLATERAL", false, false, $product, -1))
+
+"notionalCurrency": {
+	"value": "$!utils.getValueAt("PRODUCTS:PRODUCT_:RESPONSE:PREMIUM_CURRENCY", false, true, $product, -1)",
+	"isUserOverridden": true
+},
+
+"effectiveDate": {
+    "value": "$!utils.excelToUTCDate($!utils.getValueAt("PRODUCTS:PRODUCT_:REQUEST:DEAL:LEGS:LEG_:START_DATE", false, false, $product, 0), "yyyy-MM-dd")",
+	"isUserOverridden": true
+},
+"expiryDate": {
+	"value": "$!utils.excelToUTCDate($!utils.getPeriodEndDate($product), "yyyy-MM-dd")",
+	"isUserOverridden": true
+},
+"terminationDate": {
+	"value": "$!utils.excelToUTCDate($!utils.getValueAt("PRODUCTS:PRODUCT_:REQUEST:DEAL:LEGS:LEG_:END_DATE", false, false, $product, 0), "yyyy-MM-dd")",
+	"isUserOverridden": true
+},
+"notionalSchedule": {
+	#if ($StringUtils.isEmpty($!utils.getNotionalSchedule($product)))
+	
+	#else
+		"value": "$!utils.getNotionalSchedule($product)" ,
+		"isUserOverridden": true	
+	#end
+},
+"markitwireSales": {
+	#if ($markitwireSalesValue)
+    	"value": $utils.dictToJsonBoolean($markitwireSalesValue)
+    #else
+    	"value": false
+	#end
+	,"isUserOverridden": true
+},
+"comment": {
+    #set($comment = $!utils.getValueAt('HEADER:SENTINEL:SALES_COMMENT', false, false, -1, -1))
+    #if($comment)
+        "value": "$StringEscapeUtils.escapeJava($comment)",
+        "isUserOverridden": true
+    #end
+},
+"level": {},
+"underlyingAssetType": {},
+"singleorMultiCurrency": {},
+"deliveryType": {
+	"value": "CASH",
+	"isUserOverridden": true
+},
+"startTenor": {
+	#if($!utils.getValueAt('PRODUCTS:PRODUCT_:HEADER:SENTINEL:START_TENOR', false, false, 1, -1))
+    	"value":  "$!utils.getValueAt('PRODUCTS:PRODUCT_:HEADER:SENTINEL:START_TENOR', false, false, 1, -1)",
+		"isUserOverridden": true
+    #end
+},
+"isinStatus": {},                       
+"version": {},                         
+"parent": {},                           
+"isin": {},                             
+"fullName": {},
+"classificationType": {},
+"cfi": {},
+"commodityDerivativeIndicator": {},     
+"issuerorOperatoroftheTradingVenueIdentifier": {}, 
+"shortName": {},
+"quantity": {
+	"value": 1
+},
+
+#if ($data.get("sub_product")=="RatesFixedFloat")
+	"startType": {
+		#if($!utils.getValueAt('PRODUCTS:PRODUCT_:HEADER:SENTINEL:START_TYPE', false, false, 1, -1))
+	    	"value":  "$!utils.getValueAt('PRODUCTS:PRODUCT_:HEADER:SENTINEL:START_TYPE', false, false, 1, -1).toUpperCase()",
+			"isUserOverridden": true
+		#end
+	},
+	"residualDays": {
+		#if($!utils.getValueAt('PRODUCTS:PRODUCT_:HEADER:SENTINEL:RESIDUAL_DAYS', false, false, 1, -1))
+	    	"value":  $!utils.getValueAt('PRODUCTS:PRODUCT_:HEADER:SENTINEL:RESIDUAL_DAYS', false, false, 1, -1),
+			"isUserOverridden": true
+	    #end
+	},
+	"immRoll": {
+		#if($!utils.getValueAt('PRODUCTS:PRODUCT_:HEADER:SENTINEL:IMM_ROLL', false, false, 1, -1))
+	    	"value":  "$!utils.getValueAt('PRODUCTS:PRODUCT_:HEADER:SENTINEL:IMM_ROLL', false, false, 1, -1)",
+			"isUserOverridden": true
+	    #end
+	},
+	"quoteConvention": {
+		"value": "FixedCoupon"
+	},
+#end
+
+#if ($data.get("sub_product")=="RatesFixedFloat" && $data.get("sub_product")=="RatesFixedFloatOis" && $data.get("sub_product")=="RatesFixedFloat0Coupon")
+	"requestedFloatSpreadLeg2": {},
+#end
+
+#if ($data.get("sub_product")=="RatesFixedFixed")
+	"requestedFixedRateLeg2": {},
+	"quoteConvention": {
+		"value": "FixedCoupon"
+	},    
+#end
+
+#if ($data.get("sub_product")=="RatesBasis")
+	"quoteConvention": {
+		"value": "Basis"
+	},    
+#end
+
+"requestedQuoteConvention": {
+    #if($quoteConvention)
+        "value": "$quoteConvention",
+		"isUserOverridden": true
+    #end
+},
+"requestedFixedRateLeg1": {},
+"requestedUpfrontPayment": {},
+#set ($totv = $utils.getValueAt("HEADER:SENTINEL:TOTV", false, false, -1, -1))
+"totv": {
+	#if(!$totv || $totv == 1)
+		"value": true
+	#else
+		"value": false
+	#end
+},
+#set ($utotv = $utils.getValueAt("HEADER:SENTINEL:UTOTV", false, false, -1, -1))
+"utotv": {
+	#if(!$utotv || $utotv == 0)
+		"value": false
+	#else
+		"value": true
+	#end
+},
+"otherTermsIndicator": {
+    "value": "C=Constant",
+	"isUserOverridden": true
+},
+"fisn": {},                             
+"priceMultiplier": {
+	"value": $!utils.getPriceMultiplier($product),
+	"isUserOverridden": true
+},
+"embeddedOptionality": {
+    "value": false
+},
+"upfrontPaymentCcy": {}, ## TODO: Empty value (Quote Convention section)
+"termRollConv": {},
+"tenor": {
+	"value": "$!utils.getValueAt('PRODUCTS:PRODUCT_:REQUEST:DEAL:LEGS:LEG_:TENOR', false, true, $product, 0)",
+	"isUserOverridden": true
+},
+"attachment": {},                 
+"isoReferenceRate": {},                 
+"isoOtherLegReferenceRate": {},  
+"collateralCurrency": {
+	#if ($collateralCurrencyValue)
+    	"value": $collateralCurrencyValue,
+		"isUserOverridden": true
+    #end
+},
+"collateral": {
+	#if ($collateralValue == "COLLAT")
+    	"value": true
+    #else
+    	"value": false
+    #end
+},  
+"legs": {
+	#set($firstLegType = $!utils.getValueAt("PRODUCTS:PRODUCT_:REQUEST:DEAL:LEGS:LEG_:LOAN_RATE_NATURE", false, true, $product, 0))
+	#set($secondLegType= $!utils.getValueAt("PRODUCTS:PRODUCT_:REQUEST:DEAL:LEGS:LEG_:LOAN_RATE_NATURE", false, true, $product, 1))
+	
+	#if($firstLegType == 1 && $secondLegType == 0) ## LEGS SWITCHED (FLOAT FIX)
+		#set($range = [1..0])
+	#else
+		#set($range = [0..1])
+	#end
+	
+    #foreach($leg in $range)
+    	
+    	#if($leg == 0)
+    		#set($currentLegType = $firstLegType)
+    	#else
+    		#set($currentLegType = $secondLegType)
+    	#end
+    	
+       	#set ($fixedRateValue = $utils.getValueInArray("PRODUCTS:PRODUCT_:REQUEST:DEAL:LEGS:LEG_:PERIOD_APPLICABLE_RATES", false, true, 0, $product, $leg))
+		#set ($fixedRateValue = $fixedRateValue * 0.01)
+        
+        #if($currentLegType == 0)
+        	#if ($data.get("sub_product")=="RatesFixedFloatOis" || $data.get("sub_product")=="RatesFixedFloat" || $data.get("sub_product")=="RatesFixedFloat0Coupon")
+        		"first": {
+                	"fixedRate": {
+                		"value": $fixedRateValue,
+						"isUserOverridden": true
+					},
+					"isFixed": {
+						"value": true
+					}
+			#elseif ($data.get("sub_product")=="RatesFixedFixed")
+                #if ($leg== 0)
+                    "first": {
+				#else
+					,"other": {
+				#end
+                	"fixedRate": {
+						"value": $fixedRateValue,
+						"isUserOverridden": true
+					},
+					"isFixed": {
+						"value": true
+					}
+             #end
+             #parse("templates/sentinel/SWAP/leg.vm")
+             
+        #elseif ($currentLegType == 1)
+        
+        	#set ($notionalCurrencyValue = $!utils.getValueAt("PRODUCTS:PRODUCT_:REQUEST:DEAL:LEGS:LEG_:LOAN_PAYMENT_CURRENCY", false, true, $product, $leg))
+			#set ($indexName = $!utils.getValueAt("PRODUCTS:PRODUCT_:REQUEST:DEAL:LEGS:LEG_:INDEX_NAME", false, true, $product , $leg))
+			#if (!$notionalCurrencyValue || !$indexName)
+				#set ($referenceRateVal = "")
+			#else
+				#set ($referenceRateVal = $conv['FLOATING_RATES_INDICES'].get($notionalCurrencyValue).get($indexName))
+			#end
+			
+            #if ($data.get("sub_product")=="RatesBasisOis" || $data.get("sub_product")=="RatesBasis")
+                #if ($leg== 0)
+                    "first": {					                        	
+                #else
+                    ,"other": {
+                #end
+                "referenceRate": {
+					#if($referenceRateVal != "" && $referenceRateVal)
+						"value": "$referenceRateVal"
+					#end                                      
+				},
+				"referenceRateTerm": {
+					"value": "$!utils.getValueAt("PRODUCTS:PRODUCT_:REQUEST:DEAL:LEGS:LEG_:INDEX_FREQUENCY", false, true, $product, $leg)"
+				}
+            #elseif ($data.get("sub_product")=="RatesFixedFloatOis" || $data.get("sub_product")=="RatesFixedFloat" || $data.get("sub_product")=="RatesFixedFloat0Coupon")
+                ,"other": {
+                	"referenceRate": {
+						#if($referenceRateVal != "" && $referenceRateVal)
+							"value": "$referenceRateVal"
+                       #end
+					},
+					"referenceRateTerm": {
+						"value": "$!utils.getValueAt("PRODUCTS:PRODUCT_:REQUEST:DEAL:LEGS:LEG_:INDEX_FREQUENCY", false, true, $product, $leg)"
+					},
+					"isFixed": {
+						"value": false
+					}
+            #end  
+            #parse("templates/sentinel/SWAP/leg.vm")                                
+        #end
+        }                                    
+    #end
+}

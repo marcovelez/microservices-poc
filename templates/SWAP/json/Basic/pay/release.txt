@@ -1,0 +1,15 @@
+'rfq/releaseQuote':
+{
+	"id": "63",
+	"version": 6,
+	"markup": {
+		"pay": {
+			"xva": {
+				"value": 0
+			},
+			"sales": {
+				"value": 0
+			}
+		}
+	}
+}

@@ -1,0 +1,17 @@
+{
+	"id": "6",
+	"version": 8,
+	"markup": {
+		"pay": {
+			"xva": {
+				"value": 0
+			},
+			"sales": {
+				"value": 0
+			},
+			"priceBreakdown": {
+				"value": 0
+			}
+		}
+	}
+}
