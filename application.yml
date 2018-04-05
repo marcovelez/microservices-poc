@@ -6,4 +6,4 @@ eureka:
 	  
 	  
 instances:
-    sentinel-service: sentinel-service
+  sentinel-service: sentinel-service
