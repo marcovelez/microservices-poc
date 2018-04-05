@@ -6,4 +6,6 @@ eureka:
 
 instances:
   sentinel-service: sentinel-service
-  another-service: another-service
+
+foo:
+  bar: foo-bar
