@@ -8,4 +8,4 @@ instances:
   sentinel-service: sentinel-service
 
 foo:
-  bar: foo-bar2
+  bar: new-foo-bar
