@@ -1,5 +1,0 @@
-{
-	"id": "64",
-	"reason": "Covered",
-	"explanation": "test"
-}
